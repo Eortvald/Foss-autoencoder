@@ -2,7 +2,7 @@
 Autoencoder as feature extractor
 
 
-# Authors
-Emil Ortvald
-Peter Hulgaard
-Anderas Hornemann
+### Authors
+Emil Ortvald  
+Peter Hulgaard  
+Anderas Hornemann  
