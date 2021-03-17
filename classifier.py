@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 training_data = datasets.FashionMNIST(
     root= "data",
     train = True,
-    download = False,
+    download = True,
     transform=ToTensor(),
 )
 
