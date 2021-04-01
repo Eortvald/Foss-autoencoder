@@ -1,25 +1,57 @@
 # autoencoder
-
 import numpy as np
 import torch, torchvision
+import torch.nn as nn
+import torch.nn.functional as F
+
+#The tensors will be moved to CUDA GPU if it is avaialbe,
+# if not - it will stay on CPU
+torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+#Test
+tensor = torch.rand(3,4)
+print(f"Shape of tensor: {tensor.shape}")
+print(f"Datatype of tensor: {tensor.dtype}")
+print(f"Device tensor is stored on: {tensor.device}")
 
 
-class simpleAE():
+class VAE(nn.Module):
 
     def __init__(self):
+
+        #init encoder
+
+
+        #init decoder
+        pass
+    def encode(self,):
         pass
 
-    def feedforward(self):
+    def decode(self):
         pass
 
+    def reparameterize(self):
+        pass
 
-arr = np.array([1, 2, 3, 4, 5])
+    def forward(self):
+        pass
 
-print('Det virker som det skal , hvis du kan se dette')
+    def loss_function(self):
+        #ELBO
+        pass
 
+    def sample(self):
+        pass
 
+    def generate(self):
+        pass
+
+#Tensors to Numpy array
+#Tensor.numpy()
 
 if __name__ == "__main__":
+    prediction = VAE(data)
+
     # Script in under this statement will only be run when this file is executed
     # If you import and run this file from another script,
     # the interpreter will ignore function call made in this statement
