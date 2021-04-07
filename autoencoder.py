@@ -20,14 +20,15 @@ transform = transforms.Compose(
 
 DOWNLOAD = False
 
-trainset = datasets.CIFAR10(root='./data', train=True, download=DOWNLOAD, transform=transform)
-trainloader = DataLoader(trainset, batch_size=4, shuffle=False, num_workers=2)
+b_size = 4
 
-# testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
-# testloader = DataLoader(testset, batch_size=4, shuffle=False, num_workers=2)
+trainset = datasets.CIFAR10(root='./data', train=True, download=DOWNLOAD, transform=transform)
+trainloader = DataLoader(trainset, batch_size=b_size, shuffle=False, num_workers=2)
+
+testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+testloader = DataLoader(testset, batch_size=b_size, shuffle=False, num_workers=2)
 
 num_epochs = 10
-batch_size = 128
 learning_rate = 1e-3
 
 # dimension of the hidden layers
@@ -149,15 +150,19 @@ if __name__ == "__main__":
 
     for epoch in range(num_epochs):
         train_loss = 0.0
-        for batch_idx, (img, _) in enumerate(trainloader):
-            optimizer.zero_grad()
+        for batch_idx, (img, _) in enumerate(testloader):
+
+            # forward
             output, mean, log_var = model(img)
             loss = loss_function(output, img, mean, log_var)
+
+            # backwards
+            optimizer.zero_grad()
             loss.backward()
-            train_loss += loss.item()
             optimizer.step()
 
-        to_print = f"epoch:{epoch + 1} of {num_epochs} | Loss: {train_loss / batch_size}"
+
+        to_print = f"epoch:{epoch + 1} of {num_epochs} | Loss: {loss.item() / b_size}  | {loss.item()}"
         print(to_print)
     torch.save(model.state_dict(), './VAE.pth')
     # Script in under this statement will only be run when this file is executed
