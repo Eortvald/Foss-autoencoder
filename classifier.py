@@ -1,5 +1,5 @@
-#%%
-
+import os
+import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -9,8 +9,16 @@ from torchvision.transforms import ToTensor, Lambda
 from torchvision import datasets
 import matplotlib.pyplot as plt
 import numpy as np
+"""
 
-#%%
+df = pd.read_csv("Path + filename")
+
+with os.scandir("Path til billeder") as entries:
+    for entry in entries:
+        img = np.load(entry)
+        label = df. iloc[entry.split(".")[0]]
+
+"""
 
 training_data = datasets.CIFAR10(
     root ="data",
@@ -30,7 +38,6 @@ testloader = torch.utils.data.DataLoader(test_data,batch_size=4, shuffle=False, 
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
-#%%
 
 def imshow(img):
     img = img/2 + 0.5
@@ -43,8 +50,6 @@ images, labels = dataiter.next()
 imshow(torchvision.utils.make_grid(images))
 
 print (' '.join('%5s' % classes[labels[j]] for j in range(4)))
-
-#%%
 
 class Net(nn.Module):
     def __init__(self):
@@ -67,12 +72,12 @@ class Net(nn.Module):
 net = Net()
 
 
-#%%
+
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
-#%%
+
 
 for epoch in range(2):
     running_loss=0.0
@@ -92,12 +97,12 @@ for epoch in range(2):
             running_loss = 0.0
 print('Finished Training')
 
-#%%
+
 
 PATH = './cifar_net.pth'
 torch.save(net.state_dict(), PATH)
 
-#%%
+
 
 dataiter = iter(testloader)
 images, labels = dataiter.next()
@@ -105,22 +110,22 @@ images, labels = dataiter.next()
 imshow(torchvision.utils.make_grid(images))
 print('GroundTruth: ',' '.join('%5s' % classes[labels[j]] for j in range(4)))
 
-#%%
+
 
 net.load_state_dict(torch.load(PATH))
 
-#%%
+
 
 outputs= net(images)
 
-#%%
+
 
 _, predicted = torch.max(outputs, 1)
 
 print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
                               for j in range(4)))
 
-#%%
+
 
 correct = 0
 total = 0
@@ -134,7 +139,7 @@ with torch.no_grad():
 
 print('Accuracy of the network on the 10000 test images: %d %%' % (100*correct/total))
 
-#%%
+
 
 class_correct = list(0. for i in range(10))
 class_total = list(0. for i in range(10))
@@ -152,12 +157,12 @@ for i in range(10):
     print('Accuracy of %5s : %2d %%' %(
         classes[i], 100*class_correct[i] / class_total[i]))
 
-#%%
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+#device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 print(device)
 
-#%%
+
 
 
