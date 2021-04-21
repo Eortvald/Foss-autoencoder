@@ -10,6 +10,7 @@ import os
 
 # Loading and transforming data (Currently transforming the 3 (RGB) channels to a normalized value -1 to 1
 # Consider what the batch_size means in our case of dat
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 transform = transforms.Compose(
     [transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
