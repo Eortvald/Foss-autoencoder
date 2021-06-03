@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
         to_print = f"epoch:{epoch + 1} of {num_epochs} | Loss: {loss.item() / b_size}  | {loss.item()}"
         print(to_print)
-    torch.save(model.state_dict(), './VAE.pth')
+    torch.save(model.state_dict(), 'VAE.pth')
     # Script in under this statement will only be run when this file is executed
     # If you import and run this file from another script,
     # the interpreter will ignore function call made in this statement
