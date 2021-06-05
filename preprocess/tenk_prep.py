@@ -1,21 +1,23 @@
 import numpy as np
 import pandas as pd
-import os
+import matplotlib.pyplot as plt
 
 #Choosing width and height cut-off
-max_w = 85
+max_w = 89
 max_h = 200
-
+n = 0
+i = 0
 #Path to root of images
 path = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/BlobArchive_v2/'
-savepath = ''
+savepath = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/tenkblobs/'
 
 #Labels
 df = pd.read_csv('Classifier_labels.csv')
 
 #Looping through the 10000 first images
-for i in range(1):
-    sti = path + str(df.iloc[i]['folder']) + '/' + str(df.iloc[i]['Names'])
+while n < 10000:
+    i += 1
+    sti = path + str(df.iloc[i]['folder']) + '/' + str(df.iloc[i]['Names'] + '.npy')
     img = np.load(sti)
 
     #Get width and height
@@ -23,10 +25,8 @@ for i in range(1):
     wid = np.shape(img[:, :, 0])[1]
 
     #Check if image isn't oversized
-    if (hei > 200) or (wid > 85)
-        print(df.iloc[i]['ccolor'])
-
-    else:
+    if (hei <= max_h) and (wid <= max_w):
+        n += 1
         #Apply mask
         mask = img[:,:,7]
         img = np.where(mask[...,None] != 0, img, [0,0,0,0,0,0,0,0])
@@ -47,4 +47,16 @@ for i in range(1):
 
         # Zero padding
         img = np.pad(img, ((int(rhei2),int(rhei1)), (int(rwid1),int(rwid2)), (0,0)), 'constant')
-        print(np.shape(img))
+
+        #Saving edited image.
+        savename = savepath + str(df.iloc[i]['Names'])
+
+        #Get the label as string (e.g. 'Wheat' or 'Cleaved')
+        label = str(df.loc[i][1:8][df.loc[i][1:8] == True]).split(' ')[0]
+
+        #New array that contains image and label
+        img_labeled = np.array([img, label], dtype = object)
+
+        #Save the image + label
+        np.save(savename, img_labeled)
+print(n)
