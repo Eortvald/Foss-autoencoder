@@ -5,7 +5,13 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
 #Folder loading
-path =
+
+def npy_loader(path):
+    sample = torch.from_numpy(np.load(path))
+    return sample
+
+
+traindataset = datasets.DatasetFolder(root='PATH', loader=npy_loader,extensions=['.npy'])
 
 #Transforms
 transform = transforms.Compose(
