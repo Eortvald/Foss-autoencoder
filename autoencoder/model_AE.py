@@ -12,12 +12,7 @@ from model_run import *
 
 # The device will be set to CUDA GPU if available,
 # if not - it will de set to CPU
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-print(f'Using {device} device')
 
-transform = transforms.Compose(
-    [transforms.ToTensor(),
-     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 train_loader = 2
 test_loader = 2
@@ -65,32 +60,18 @@ class AE(nn.Module):
     def encode(self, x):
         encode_out = self.encoder(x)
         encode_out = encode_out.view(encode_out.size(0), -1)
-        # print(encode_out.shape)
-
-
-        # print(f'Mean Tensor: {mean.shape} \n Var Tensor: {log_var.shape}')
-
         return [mean, log_var]
 
 
     def decode(self, Z):
-        # Dense layer
-        # print(f'Z shape : {Z.shape}')
         Z = Z.view(Z.size(0), 128, 7, 7)
-
-        # print(f'Z shape : {Z.shape}')
-
-        # Reshape Linear into Conv ready shape again
         decode_out = self.decoder(Z)
         return decode_out
 
     def forward(self, x):
-        # decode z to get x_hat
-        x_hat = self.decode(self.encode(x))
-        return x_hat
+        X_hat = self.decode(self.encode(x))
+        return X_hat
 
-    def grain_hat(self, x):
-        return self.forward(x)
 
 
 def train(model, num_epochs=5, batch_size=64, learning_rate=1e-3):
