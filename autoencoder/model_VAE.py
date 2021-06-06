@@ -8,6 +8,7 @@ from torch import nn, optim
 from torch.nn import functional as F
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
+from model_run import *
 
 # The device will be set to CUDA GPU if available,
 # if not - it will de set to CPU
