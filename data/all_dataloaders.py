@@ -5,7 +5,7 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
 #Folder loading
-
+path =
 
 #Transforms
 transform = transforms.Compose(
