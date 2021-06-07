@@ -30,7 +30,9 @@ def dataset_from_collection(PATH:str, batch_size: int, transform: object = None,
 
 train_loader, test_loader = dataset_from_collection(PATH=PATH_dict['10K'], transform=Norm_transform, batch_size=128)
 
-print(train_loader[0])
+for b_index, (X,y) in enumerate(test_loader):
+    if b_index % 10 == 0:
+        print(f'Batch number:{b_index} | Image:{X}\n Image Label:{y}')
 # Transforms
 
 
