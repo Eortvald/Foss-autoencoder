@@ -67,7 +67,9 @@ class Net(nn.Module):
 
     def forward(self, x):
         x = self.pool(F.relu(self.bn1(self.conv1(x))))
+        #x = F.relu(self.bn1(self.conv1(x)))
         x = self.pool(F.relu(self.bn2(self.conv2(x))))
+        #x = F.relu(self.bn2(self.conv2(x)))
         x = x.view(-1, 16 * 5 * 5)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
@@ -90,7 +92,7 @@ if os.path.isfile(model_path):
     net.load_state_dict(torch.load(model_path))
     print('Loaded model parameters from disk.')
 else:
-    for epoch in range(2):  # loop over the dataset multiple times
+    for epoch in range(20):  # loop over the dataset multiple times
 
         running_loss = 0.0
         for i, data in enumerate(trainloader, 0):
