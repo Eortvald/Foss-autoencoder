@@ -28,7 +28,7 @@ def npy_dir(path: str, subset: str):
 
     data_x = []
     data_y = []
-    for i, NPY in enumerate(listdir(path)[:10]):
+    for i, NPY in enumerate(listdir(path)[:100]):
 
         img, label = np.load(path+NPY, allow_pickle=True)
         data_x.append(img)
@@ -47,11 +47,11 @@ def npy_dir(path: str, subset: str):
 
 xtrain, ytrain = npy_dir(PATH['10K'], 'train/')
 #train_data = TensorDataset(xtrain, ytrain)
-Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=10)
+Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=160)
 
 xtest, ytest = npy_dir(PATH['10K'], 'test/')
 #test_data = TensorDataset(xtest, ytest)
-Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=10)
+Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=40)
 
 if __name__ == "__main__":
 
