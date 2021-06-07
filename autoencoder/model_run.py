@@ -5,6 +5,8 @@ from torch import nn, optim
 from torch.nn import functional as F
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
+from CAE_model import CAE
+from data.dataload_collection import *
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Using {device} device')
@@ -53,15 +55,17 @@ def test_AE(model, test_loader):
     print(f'Test Error: Avg loss: {test_loss} \n')
 
 
-model = AE()
+model = CAE()
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
 num_epochs = 10
 
-for epoch in range(num_epochs):
-    print(f'Epoch {epoch} \n---------------------')
+if __name__ == "__main__":
 
-    train_AE(model, train_loader)
-    test_AE(model, test_loader)
+    for epoch in range(num_epochs):
+        print(f'Epoch {epoch} \n---------------------')
 
-torch.save(model.state_dict(), 'model_dicts/VAE.pth')
+        train_AE(model, train_loader)
+        test_AE(model, test_loader)
+
+    torch.save(model.state_dict(), 'model_dicts/VAE.pth')
