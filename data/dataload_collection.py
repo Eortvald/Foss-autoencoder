@@ -5,14 +5,15 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
 # PATHS
-PATH_10K = 'path'
+PATHS = {'10K' : 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs',
+         'nyt datasæt' : 'path til nyt datasæt'}
 
 # Transforms
 Norm_transform = transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 #Folder loading
 
 
-def dataset_from_collection(PATH:str, transform, batch_size: int, filetype: str='.npy'):
+def dataset_from_collection(PATH:dict, transform, batch_size: int, filetype: str='.npy'):
 
     npy_load = lambda PATH:torch.from_numpy(np.load(PATH,allow_pickle=True))
 
