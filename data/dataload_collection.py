@@ -5,6 +5,8 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, TensorDataset
 from os import listdir
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 # PATHS
 PATH = {'10K': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
         'nyt datasæt': 'path til nyt datasæt'}
@@ -28,7 +30,7 @@ def npy_dir(path: str, subset: str):
 
     data_x = []
     data_y = []
-    for i, NPY in enumerate(listdir(path)[:800]):
+    for i, NPY in enumerate(listdir(path)[:100]):
 
         img, label = np.load(path+NPY, allow_pickle=True)
         data_x.append(img)
@@ -39,25 +41,32 @@ def npy_dir(path: str, subset: str):
         #print(i,numeric_label)
 
     print('Done reading images')
-    tx = torch.tensor(data_x)
-    ty = torch.tensor(data_y, dtype = torch.uint8)
+    wx = torch.tensor(data_x, dtype=torch.float)
+    tx = wx.permute(0, 3, 1, 2)
+    ty = torch.tensor(data_y, dtype=torch.float)
 
     return tx, ty
 
 
 xtrain, ytrain = npy_dir(PATH['10K'], 'train/')
+print(device)
+xtrain, ytrain = xtrain.to(device), ytrain.to(device)
+print(f'Type fomr coll: {xtrain.type()}')
 #train_data = TensorDataset(xtrain, ytrain)
-Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=160)
+Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=10)
 
 xtest, ytest = npy_dir(PATH['10K'], 'test/')
+xtest, ytest = xtest.to(device), ytest.to(device)
 #test_data = TensorDataset(xtest, ytest)
-Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=40)
+Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=10)
 
 if __name__ == "__main__":
 
-    for b_index, (X, y) in enumerate(Ktest_loader):
-        if b_index % 10 == 0:
-            print(f'Batch number:{b_index} | Image:{X[0]}\n Image Label:{y[0]}')
+    pass
+
+    #for b_index, (X, y) in enumerate(Ktest_loader):
+     #   if b_index % 10 == 0:
+      #      print(f'Batch number:{b_index} | Image:{X[0]}\n Image Label:{y[0]}')
 
 
 """

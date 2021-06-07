@@ -25,12 +25,15 @@ class CAE(nn.Module):
             nn.ReLU(True),
             nn.Conv2d(18, 24, kernel_size=3, stride=2, padding=1, bias = False),
             nn.BatchNorm2d(24),
-            nn.ReLU(True)
+            nn.ReLU(True),
+            nn.Flatten()
         )
 
-        self.fcZ = nn.Linear(4*24,z_dim)
+        self.fcZ = nn.Linear(26400,z_dim)
+
         # Decoder setup
         self.decoder = nn.Sequential(
+            nn.Unflatten(1,(30,40,40)),
             nn.ConvTranspose2d(24, 18, 2, stride=1, padding=0, bias = False),
             nn.BatchNorm2d(18),
             nn.ReLU(True),
@@ -43,12 +46,13 @@ class CAE(nn.Module):
 
     def encode(self, x):
         encode_out = self.encoder(x)
-        flat_encode_out = encode_out.view(encode_out.size(0), -1)
-        Z = self.fcZ(flat_encode_out)
+        print(f'encode dim:{encode_out.size()}')
+        #flat_encode_out = encode_out.view(encode_out.size(0), -1)
+        Z = self.fcZ(encode_out)
+        print(f'Z dimension: {Z.size()}')
         return Z
 
     def decode(self, Z):
-        Z = Z.view(Z.size(0), 128, 7, 7)
 
         decode_out = self.decoder(Z)
         return decode_out

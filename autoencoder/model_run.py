@@ -25,8 +25,11 @@ def train_AE(model, train_loader):
 
     for batch_num, (X, _) in enumerate(train_loader):
         # Regeneration and loss
+        _ = _.to(device)
         X = X.to(device)
-        X_hat = model(X)
+        print(X.type())
+        X_hat = model(X).to(device)
+        X_hat = X_hat.to(device)
         loss = criterion(X_hat, X)
 
         # Back prop
@@ -51,11 +54,11 @@ def test_AE(model, test_loader):
     test_loss = 0
 
     test_out = []
-
     with torch.no_grad():
         for i, (X, _) in enumerate(test_loader):
+            _ = _.to(device)
             X = X.to(device)
-            X_hat = model(X)
+            X_hat = model(X).to(device)
             test_loss += criterion(X_hat, X).item()
             loss = criterion(X_hat, X).item()
 
@@ -78,6 +81,7 @@ if __name__ == "__main__":
     z_dim = 30
 
     CAE_10Kmodel = CAE(z_dim=z_dim)
+    CAE_10Kmodel = CAE_10Kmodel.to(device)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(CAE_10Kmodel.parameters(), lr=learning_rate)
     train_result = []
