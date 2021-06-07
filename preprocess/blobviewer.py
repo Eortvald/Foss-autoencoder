@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 i = 0
 
+
 path = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/tenkblobs'
 with os.scandir(path) as entries:
     for entry in entries:

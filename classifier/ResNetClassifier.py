@@ -1,3 +1,5 @@
+from os import listdir
+import numpy as np
 import torch
 import torch.nn as nn
 import torchvision
@@ -6,7 +8,7 @@ import torchvision.transforms as transforms
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+print(device)
 # Hyper-parameters
 num_epochs = 2
 learning_rate = 0.001
@@ -17,7 +19,7 @@ transform = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomCrop(32),
     transforms.ToTensor()])
-
+"""
 # CIFAR-10 dataset
 train_dataset = torchvision.datasets.CIFAR10(root='../../data/',
                                              train=True,
@@ -27,8 +29,25 @@ train_dataset = torchvision.datasets.CIFAR10(root='../../data/',
 test_dataset = torchvision.datasets.CIFAR10(root='../../data/',
                                             train=False,
                                             transform=transforms.ToTensor())
+"""
+#10kBlobDataset
+path = 'M:\\R&D\Technology access controlled\Projects access controlled\AIFoss\Data\Foss_student\\tenkblobs'
+train_datasetx ={path:np.load(path) for path in listdir(path) if path}
+    #np.load(path+'\\train'+'name',allow_picke = True)
+train_datasety = np.load
+test_datasetx
+test_datasety
+test_dataset =
 
+#Tensor Train
+tensor_x = torch.Tensor(train_datasetx)
+tensor_y = torch.Tensor(train_datasety)
+#Tensor Test
+tensor_xt = torch.Tensor(test_datasetx)
+tensor_yt = torch.Tensor(test_datasety)
 # Data loader
+train_dataset = TensorDataset(tensor_x,tensor_y)
+test_dataset = TensorDataset(tensor_xt, tensor_yt)
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
                                            batch_size=100,
                                            shuffle=True)
