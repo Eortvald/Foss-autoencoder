@@ -28,7 +28,7 @@ def npy_dir(path: str, subset: str):
 
     data_x = []
     data_y = []
-    for i, NPY in enumerate(listdir(path)[:100]):
+    for i, NPY in enumerate(listdir(path)[:800]):
 
         img, label = np.load(path+NPY, allow_pickle=True)
         data_x.append(img)
