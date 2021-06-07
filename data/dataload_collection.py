@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from os import listdir
 
 # PATHS
-PATH = {'10K': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs',
+PATH = {'10K': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
         'nyt datasæt': 'path til nyt datasæt'}
 
 
@@ -18,30 +18,46 @@ PATH = {'10K': 'M:/R&D/Technology access controlled/Projects access controlled/A
 def npy_dir(path: str, subset: str):
     path = path + subset
 
+    make_numeric = {'Oat': 1,
+                'Broken': 2,
+                'Rye': 3,
+                'Wheat': 4,
+                'BarleyGreen': 5,
+                'Cleaved': 6,
+                'Skinned': 7}
+
     data_x = []
     data_y = []
-    for i, NPY in enumerate(listdir(path)):
-        img, label = np.load(path+NPY, allow_pickle=True)
-        data_x[i] = img
-        data_y[i] = label
+    for i, NPY in enumerate(listdir(path)[:10]):
 
-    tx = torch.Tensor(data_x)
-    ty = torch.Tensor(data_y)
+        img, label = np.load(path+NPY, allow_pickle=True)
+        data_x.append(img)
+
+        numeric_label = make_numeric[label]
+        data_y.append(numeric_label)
+
+        #print(i,numeric_label)
+
+    print('Done reading images')
+    tx = torch.tensor(data_x)
+    ty = torch.tensor(data_y, dtype = torch.uint8)
 
     return tx, ty
 
 
-xtrain, ytrain = npy_dir(PATH['10K'], 'train')
+xtrain, ytrain = npy_dir(PATH['10K'], 'train/')
 #train_data = TensorDataset(xtrain, ytrain)
-train_loader = DataLoader(TensorDataset(xtrain, ytrain))
+Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=10)
 
-xtest, ytest = npy_dir(PATH['10K'], 'test')
+xtest, ytest = npy_dir(PATH['10K'], 'test/')
 #test_data = TensorDataset(xtest, ytest)
-test_loader = DataLoader(TensorDataset(xtest, ytest))
+Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=10)
 
-for b_index, (X, y) in enumerate(test_loader):
-    if b_index % 10 == 0:
-        print(f'Batch number:{b_index} | Image:{X}\n Image Label:{y}')
+if __name__ == "__main__":
+
+    for b_index, (X, y) in enumerate(Ktest_loader):
+        if b_index % 10 == 0:
+            print(f'Batch number:{b_index} | Image:{X[0]}\n Image Label:{y[0]}')
 
 
 """
