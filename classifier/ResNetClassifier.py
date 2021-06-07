@@ -111,6 +111,7 @@ model = ResNet(ResidualBlock, [2, 2, 2]).to(device)
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+lossarray = []
 
 # For updating learning rate
 def update_lr(optimizer, lr):
@@ -128,6 +129,7 @@ for epoch in range(num_epochs):
         # Forward pass
         outputs = model(images)
         loss = criterion(outputs, labels)
+        lossarray.append(loss.item())
 
         # Backward and optimize
         optimizer.zero_grad()
@@ -142,7 +144,8 @@ for epoch in range(num_epochs):
     if (epoch+1) % 20 == 0:
         curr_lr /= 3
         update_lr(optimizer, curr_lr)
-
+lossarray = np.array(lossarray)
+lossarray = lossarray.reshape(-1,100).mean(axis=1)
 # Test the model
 model.eval()
 with torch.no_grad():
