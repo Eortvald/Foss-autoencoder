@@ -38,7 +38,7 @@ def train_AE(model, train_loader):
         if batch_num % 5 == 0:
             loss, progress = loss.item(), batch_num * len(X)
             print(f'loss:{loss} ({loss / len(X)})  [{progress / size}]')
-
+            train_out.append(loss)
     print(f'Train Error - Avg loss: {train_loss / size}')
 
     return train_out
@@ -57,9 +57,11 @@ def test_AE(model, test_loader):
             X = X.to(device)
             X_hat = model(X)
             test_loss += criterion(X_hat, X).item()
+            loss = criterion(X_hat, X).item()
 
+            if i % 5 == 0:
+                test_out.append(loss)
     test_loss /= size
-
     print(f'Test Error: Avg loss: {test_loss} \n')
 
     return test_out
@@ -77,7 +79,7 @@ if __name__ == "__main__":
 
     CAE_10Kmodel = CAE(z_dim=z_dim)
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(CAE_10Kmodel.parameters(), lr=learning_rate, weight_decay=1e-5)
+    optimizer = optim.Adam(CAE_10Kmodel.parameters(), lr=learning_rate)
     train_result = []
     test_result = []
     for epoch in range(num_epochs):
@@ -89,6 +91,15 @@ if __name__ == "__main__":
         test_stat = test_AE(CAE_10Kmodel, Ktest_loader)
         test_result.append(test_stat)
 
+        torch.save(CAE_10Kmodel.state_dict(), 'model_dicts/CAE_10Kmodel.pth')
+
     to_save = np.array([train_result, test_result])
     np.save('model_dicts/loss_results', to_save)
     torch.save(CAE_10Kmodel.state_dict(), 'model_dicts/CAE_10Kmodel.pth')
+
+    plt.plot(np.arange(100), train_result, label='train')  # etc.
+    plt.plot(np.arange(100), test_result, label='test')
+    plt.xlabel('acummulated batches')
+    plt.ylabel('Loss')
+    plt.title("Train vs Test")
+    plt.legend()
