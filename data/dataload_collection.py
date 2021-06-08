@@ -53,12 +53,12 @@ print(device)
 xtrain, ytrain = xtrain.to(device), ytrain.to(device)
 print(f'Type fomr coll: {xtrain.type()}')
 #train_data = TensorDataset(xtrain, ytrain)
-Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=10)
+Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=10, num_workers=8)
 
 xtest, ytest = npy_dir(PATH['10K'], 'test/')
 xtest, ytest = xtest.to(device), ytest.to(device)
 #test_data = TensorDataset(xtest, ytest)
-Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=10)
+Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=10, num_workers=8)
 
 if __name__ == "__main__":
 
