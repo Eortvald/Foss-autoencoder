@@ -1,13 +1,23 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import pickle
 import os
+from datetime import *
 
-path = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Validation/Images/2017 samples/'
+path = 'model_dicts/'
 
-pickle_me = open(path+'110-E001_1.pkl', "rb")
+train = np.load(path+'train_results.npy', allow_pickle=True)
+test = np.load(path+'test_results.npy', allow_pickle=True)
 
-file = pickle.load(pickle_me)
+print(len(train),len(test))
 
-arr = np.array(file)
+plt.plot(np.arange(len(train)), train, label='train')  # etc.
+#plt.plot(np.arange(len(test)), test, label='test')
+plt.xlabel('acummulated batches')
+plt.ylabel('Loss')
+plt.title("Train vs Test")
+plt.legend()
 
-print(arr[0])
+plt.savefig(f"plots/autoencoder-plots/test_{str(datetime.now())[5:-10].replace(' ','_').replace(':','-')}.png")
+#plt.show()
+

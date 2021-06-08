@@ -9,7 +9,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # PATHS
 PATH = {'10K': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
-        'nyt datasæt': 'path til nyt datasæt'}
+        'gamer': 'C:/Data/DeepEye/Foss_student/tenkblobs/'}
 
 
 # Transforms
@@ -30,7 +30,7 @@ def npy_dir(path: str, subset: str):
 
     data_x = []
     data_y = []
-    for i, NPY in enumerate(listdir(path)[:100]):
+    for i, NPY in enumerate(listdir(path)):
 
         img, label = np.load(path+NPY, allow_pickle=True)
         data_x.append(img)
@@ -40,7 +40,7 @@ def npy_dir(path: str, subset: str):
 
         #print(i,numeric_label)
 
-    print('Done reading images')
+    print(f'Done reading {subset} images')
     wx = torch.tensor(data_x, dtype=torch.float)
     tx = wx.permute(0, 3, 1, 2)
     ty = torch.tensor(data_y, dtype=torch.float)
@@ -48,17 +48,17 @@ def npy_dir(path: str, subset: str):
     return tx, ty
 
 
-xtrain, ytrain = npy_dir(PATH['10K'], 'train/')
-print(device)
-xtrain, ytrain = xtrain.to(device), ytrain.to(device)
-print(f'Type fomr coll: {xtrain.type()}')
-#train_data = TensorDataset(xtrain, ytrain)
-Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=10, num_workers=8)
+xtrain, ytrain = npy_dir(PATH['gamer'], 'train/')
 
-xtest, ytest = npy_dir(PATH['10K'], 'test/')
+xtrain, ytrain = xtrain.to(device), ytrain.to(device)
+
+#train_data = TensorDataset(xtrain, ytrain)
+Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=100, num_workers=0, shuffle=True)
+
+xtest, ytest = npy_dir(PATH['gamer'], 'test/')
 xtest, ytest = xtest.to(device), ytest.to(device)
 #test_data = TensorDataset(xtest, ytest)
-Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=10, num_workers=8)
+Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=100, num_workers=0, shuffle=True)
 
 if __name__ == "__main__":
 
