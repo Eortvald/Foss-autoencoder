@@ -46,6 +46,6 @@ def stat_npy_dir(path: str, subset: str):
     print(std)
 
 
+stat_npy_dir(PATH,'train/')
 
-
-xtrain = torch.normal(mean=10, std=2, size=(100, 8, 10, 10))
+#xtrain = torch.normal(mean=10, std=2, size=(100, 8, 10, 10))
