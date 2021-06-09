@@ -1,10 +1,9 @@
 import numpy as np
-from datetime import *
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import torch, torchvision
 from torch import nn, optim
-from torch.nn import functional as F
+from datetime import *
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 from CAE_model import *
@@ -13,42 +12,34 @@ from data.dataload_collection import *
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Using {device} device')
 
-# Train function
 
+# Train function
 
 def train_AE(model, train_loader):
     model.train()
-    size = len(train_loader.dataset)
-    # print(f'train size:{size}')
     train_loss = 0
-    # print(f'Training on {device}')
+    dataset_size = len(train_loader.dataset)
 
-    for batch_num, (X, _) in tqdm(enumerate(train_loader)):
+    for batch_num, (X, _) in enumerate(train_loader):
         # Regeneration and loss
         X = X.to(device)
         optimizer.zero_grad()
-
         X_hat = model(X)
+
         loss = criterion(X_hat, X)
         loss.backward()
         train_loss += loss.item()
         optimizer.step()
 
         if batch_num % 10 == 0:
-            loss, progress = loss.item(), batch_num * len(X)
-            print(f'Batch[{batch_num}] | loss:{loss} ({loss/len(X)}) [{progress}/{size}]')
-            print(10*'##')
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_num * len(X), len(train_loader.dataset),
-                       100. * batch_num / len(train_loader),
-                       loss.item() / len(X)))
+            print(100 * '~')
+            progress = batch_num * len(X)
+            print(f'Batch[{batch_num}] - Batch loss:{loss.item()}\t | Avg. per. Image Loss: {loss.item() / len(X)}) [{progress}/{dataset_size}]')
 
-    train_loss /= size
-    print(f'Train Error: Avg loss: {train_loss}')
-
-    print(10 * '##')
-    print('====> Epoch: {} Average loss: {:.4f}'.format(
-        epoch, train_loss / len(train_loader.dataset)))
+    train_loss /= dataset_size
+    print(f'\t \t Train Error: Avg loss: {train_loss}')
+    print(100 * '^')
+    return train_loss
 
 
 def test_AE(model, test_loader):
@@ -56,14 +47,15 @@ def test_AE(model, test_loader):
     test_loss = 0
 
     with torch.no_grad():
-        for i, (X, _) in tqdm(enumerate(test_loader)):
+        for i, (X, _) in enumerate(test_loader):
             X = X.to(device)
             X_hat = model(X)
             test_loss += criterion(X_hat, X).item()
-            loss = criterion(X_hat, X).item()
 
     test_loss /= len(test_loader.dataset)
-    print(f'Test Error: Avg loss: {test_loss} \n')
+    print(f'\t \t \t Test Error: Avg loss: {test_loss} \n')
+
+    return test_loss
 
 
 if __name__ == "__main__":
@@ -74,30 +66,43 @@ if __name__ == "__main__":
 
     # dimension of the hidden layers
     # layer_channels = [8, 16, 32]
-    z_dim = 60
+    z_dim = 30
 
     CAE_10Kmodel = CAE(z_dim=z_dim)
     CAE_10Kmodel = CAE_10Kmodel.to(device)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(CAE_10Kmodel.parameters(), lr=learning_rate, weight_decay=1e-5)
 
-    for epoch in range(num_epochs):
-        print(f'Epoch {epoch+1} \n---------------------')
-        train_AE(CAE_10Kmodel, Ktrain_loader)
-        test_AE(CAE_10Kmodel, Ktest_loader)
+    train_log = []
+    test_log = []
 
-        torch.save(CAE_10Kmodel.state_dict(), 'model_dicts/CAE_10Kmodel.pth')
+    for epoch in range(num_epochs):
+        print(f'\n\t\t------------------------------Epoch: {epoch + 1}------------------------------')
+        train_save = train_AE(CAE_10Kmodel, Ktrain_loader)
+        train_log.append(train_save)
+
+        print('\t\t\t>>>>>>>>>>>>>>>>TEST RESULTS<<<<<<<<<<<<<<<<<')
+        test_save = test_AE(CAE_10Kmodel, Ktest_loader)
+        test_log.append(test_save)
+
+    print(f'Length of train log: {len(train_log)}')
+    print(f'Length of test log: {len(test_log)}')
+    print(train_log)
 
 
     torch.save(CAE_10Kmodel.state_dict(), 'model_dicts/CAE_10Kmodel.pth')
 
-    #np.save('model_dicts/train_results', train_save, allow_pickle=False)
-    #np.save('model_dicts/test_results', test_save, allow_pickle=False)
 
-    #plt.plot(np.arange(len(train_save)), train_save, label='train')  # etc.
-    #plt.plot(np.arange(len(test_save)), test_save, label='test')
-    #plt.xlabel('acummulated batches')
-    #plt.ylabel('Loss')
-    #plt.title("Train vs Test")
-    #plt.legend()
-    #plt.savefig(f"results_run-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png")
+
+    #np.save('model_dicts/train_results', train_save, allow_pickle=False)
+    # np.save('model_dicts/test_results', test_save, allow_pickle=False)
+
+    plt.plot(np.arange(len(train_log)), train_log, label='Train')  # etc.
+    plt.plot(np.arange(len(test_log)), test_log, label='Test')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title("Train vs Test")
+    plt.legend()
+    abspath = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/Foss-autoencoder/plots/autoencoder-plots/'
+    plt.savefig(f"{abspath}results_run-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png")
+    plt.savefig(f"results_run-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png")

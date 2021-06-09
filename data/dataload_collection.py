@@ -3,7 +3,8 @@ import torch, torchvision
 from torch import nn
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, TensorDataset
-import datetime
+from datetime import *
+from tqdm import tqdm
 from os import listdir
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -15,7 +16,7 @@ PATH_dict = {
 
 ### If training on Foss Laptop select '10K'
 ### If training on Gamer select 'gamer'
-PATH = PATH_dict['10K']
+PATH = PATH_dict['gamer']
 
 # Transforms
 MEAN_8ch = np.load('10K_mean.npy')
@@ -48,8 +49,8 @@ def npy_dir(path: str, subset: str):
     folder_images = len(folder)
     for i, NPY in enumerate(folder):
 
-        if i % 10 == 0:
-            print(f'Images loaded: [{i}/{folder_images}]  ------  {str(datetime.datetime.now())[11:-7]}')
+        if i % 200 == 0:
+            print(f'Images loaded: [{i}/{folder_images}]  ------  {str(datetime.now())[11:-7]}')
         img, label = np.load(path + NPY, allow_pickle=True)
         data_x.append(img)
         numeric_label = make_numeric[label]
@@ -59,13 +60,14 @@ def npy_dir(path: str, subset: str):
 
     print(f'Done reading {subset} images')
     wx = torch.tensor(data_x, dtype=torch.float)
+    print('Beginning permute')
     tx = wx.permute(0, 3, 1, 2)
+    print('Finished permute')
     ty = torch.tensor(data_y, dtype=torch.float)
     print(f'Dimension of X is :{tx.size()}')
     print(tx[0])
     print('Beginning Norm transform')
     tx = T(tx)
-    ty = T(ty)
     print('Norm transform finished')
     print(f'Dimension of X is :{tx.size()}------------')
     print(tx[0])
