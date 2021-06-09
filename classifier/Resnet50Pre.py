@@ -1,4 +1,3 @@
-%matplotlib inline
 import time
 import numpy as np
 import pandas as pd
@@ -14,10 +13,10 @@ from torch.autograd import Variable
 from torch.utils.data import Dataset, DataLoader
 import torchvision
 from torchvision import transforms, datasets, models
-from data.all_dataloaders import npy_loader
+from data.dataload_collection import *
 
-train_dl = npy_loader()
-valid_dl = npy_loader()
+train_dl = Ktrain_loader
+valid_dl = Ktest_loader
 
 use_gpu = torch.cuda.is_available()
 resnet = models.resnet50(pretrained=True)
