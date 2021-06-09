@@ -1,5 +1,5 @@
 import torch
-import numpy as np
+import numpy
 from sklearn.metrics import accuracy_score
 from .nn import Linear
 from .nn import ReLU
@@ -59,15 +59,20 @@ def train_model(traindataloader, model):
 def model_evaluate(testdataloader, model):
     predictions, actuals = list(), list()
     for i, (inputs, targets) in enumerate(testdataloader):
+        #Evaluating model on test set
         yhat = model(inputs)
         yhat = yhat.detach().numpy()
         actual = targets.numpy()
+        #Converting to class labels
+        yhat = argmax(yhat,axis=1)
+        #Reshaping
+        yhat = yhat.reshape((len(yhat),1))
         actual = actual.reshape((len(actual), 1))
-        yhat = yhat.round()
-
+        #Lists
         predictions.append(yhat)
         actuals.append(actual)
     predictions, actuals = vstack(predictions), vstack(actuals)
+    #Accuracy calculation
     accuracy = accuracy_score(actuals, predictions)
     return accuracy
 def predict(row, model):
