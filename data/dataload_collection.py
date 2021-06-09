@@ -3,6 +3,7 @@ import torch, torchvision
 from torch import nn
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, TensorDataset
+import datetime
 from os import listdir
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -13,7 +14,7 @@ PATH_dict = {'10K': 'M:/R&D/Technology access controlled/Projects access control
 
 ### If training on Foss Laptop select '10K'
 ### If training on Gamer select 'gamer'
-PATH = PATH_dict['gamer']
+PATH = PATH_dict['10K']
 
 # Transforms
 
@@ -33,7 +34,14 @@ def npy_dir(path: str, subset: str):
 
     data_x = []
     data_y = []
-    for i, NPY in enumerate(listdir(path)):
+
+    folder = listdir(path)
+    folder_images = len(folder)
+    for i, NPY in enumerate(folder):
+
+        if i % 10 == 0:
+
+            print(f'Images loaded: [{i}/{folder_images}]  ------  {str(datetime.datetime.now())[11:-7]}')
 
         img, label = np.load(path+NPY, allow_pickle=True)
         data_x.append(img)
@@ -49,8 +57,6 @@ def npy_dir(path: str, subset: str):
     ty = torch.tensor(data_y, dtype=torch.float)
     print(f'Dimension of x is :{tx.size()}')
     return tx, ty
-
-transforms.Normalize()
 
 xtrain, ytrain = npy_dir(PATH, 'train/')
 

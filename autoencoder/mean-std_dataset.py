@@ -8,13 +8,13 @@ from os import listdir
 from data.dataload_collection import npy_dir, PATH
 
 
-xtrain, ytrain = npy_dir(PATH['gamer'], 'train/')
+xtrain, ytrain = npy_dir(PATH, 'train/')
 #xtrain = torch.normal(mean=10, std=2, size=(100, 8, 10, 10))
 #ytrain = torch.normal(mean=2, std=4, size=(100, 8, 10, 10))
 
 
 dataset = TensorDataset(xtrain, ytrain)
-statload = DataLoader(dataset, batch_size=len(dataset), num_workers=0, shuffle=False)
+statload = DataLoader(dataset, batch_size=len(dataset), num_workers=8, shuffle=False)
 
 data = next(iter(statload))
 mean = torch.mean(data[0], dim=(0, 2, 3)).numpy()
