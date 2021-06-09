@@ -13,16 +13,9 @@ PATH_dict = {'10K': 'M:/R&D/Technology access controlled/Projects access control
 ### If training on Gamer select 'gamer'
 PATH = PATH_dict['gamer']
 
-def npy_dir(path: str, subset: str):
+def stat_npy_dir(path: str, subset: str):
     path = path + subset
 
-    make_numeric = {'Oat': 1,
-                'Broken': 2,
-                'Rye': 3,
-                'Wheat': 4,
-                'BarleyGreen': 5,
-                'Cleaved': 6,
-                'Skinned': 7}
 
     data_x = []
     data_y = []
@@ -35,35 +28,24 @@ def npy_dir(path: str, subset: str):
 
             print(f'Images loaded: [{i}/{folder_images}]  ------  {str(datetime.datetime.now())[11:-7]}')
 
-        img, label = np.load(path+NPY, allow_pickle=True)
+        img, _ = np.load(path+NPY, allow_pickle=True)
         data_x.append(img)
 
-        numeric_label = make_numeric[label]
-        data_y.append(numeric_label)
-
-        #print(i,numeric_label)
 
     print(f'Done reading {subset} images')
     wx = torch.tensor(data_x, dtype=torch.float)
     tx = wx.permute(0, 3, 1, 2)
-    ty = torch.tensor(data_y, dtype=torch.float)
-    print(f'Dimension of x is :{tx.size()}')
-    return tx, ty
+
+    mean = torch.mean(tx, dim=(0, 2, 3)).numpy()
+    std = torch.std(tx, dim=(0, 2, 3)).numpy()
+
+    np.save('10K_mean', mean)
+    np.save('10K_std', std)
+
+    print(mean)
+    print(std)
 
 
-xtrain, ytrain = npy_dir(PATH, 'train/')
+stat_npy_dir(PATH,'train/')
+
 #xtrain = torch.normal(mean=10, std=2, size=(100, 8, 10, 10))
-#ytrain = torch.normal(mean=2, std=4, size=(100, 8, 10, 10))
-
-
-dataset = TensorDataset(xtrain, ytrain)
-statload = DataLoader(dataset, batch_size=len(dataset), num_workers=8, shuffle=False)
-
-data = next(iter(statload))
-mean = torch.mean(data[0], dim=(0, 2, 3)).numpy()
-std = torch.std(data[0], dim=(0, 2, 3)).numpy()
-
-np.save('10K_mean', mean)
-np.save('10K_std', std)
-
-
