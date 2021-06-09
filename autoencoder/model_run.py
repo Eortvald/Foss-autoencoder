@@ -13,8 +13,6 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Using {device} device')
 
 # Train function
-train_stat = []
-test_stat = []
 
 
 def train_AE(model, train_loader):
@@ -22,7 +20,6 @@ def train_AE(model, train_loader):
     size = len(train_loader.dataset)
     # print(f'train size:{size}')
     train_loss = 0
-    t_loss = 0
     # print(f'Training on {device}')
 
     for batch_num, (X, _) in enumerate(train_loader):
@@ -30,7 +27,6 @@ def train_AE(model, train_loader):
         _ = _.to(device)
         X = X.to(device)
         X_hat = model(X).to(device)
-        X_hat = X_hat.to(device)
         loss = criterion(X_hat, X)
 
         # Back prop
@@ -39,15 +35,12 @@ def train_AE(model, train_loader):
         train_loss += loss.item()
         optimizer.step()
 
-        t_loss += loss.item() * X.size(0)
-
-        train_stat.append(loss)
         if batch_num % 5 == 0:
             loss, progress = loss.item(), batch_num * len(X)
             print(f'Batch[{batch_num}] | loss:{loss} ({loss/len(X)}) [{progress}/{size}]')
 
-
-    print(f'Train Error - Avg loss: {train_loss / size}-----------## {t_loss/len(train_loader)}')
+    train_loss /= size
+    print(f'Train Error: Avg loss: {train_loss}')
 
 
 def test_AE(model, test_loader):
@@ -56,7 +49,6 @@ def test_AE(model, test_loader):
     # print(f'test size:{size}')
     test_loss = 0
 
-    test_out = []
     with torch.no_grad():
         for i, (X, _) in enumerate(test_loader):
             _ = _.to(device)
@@ -64,8 +56,6 @@ def test_AE(model, test_loader):
             X_hat = model(X).to(device)
             test_loss += criterion(X_hat, X).item()
             loss = criterion(X_hat, X).item()
-
-            test_stat.append(loss)
 
     test_loss /= size
     print(f'Test Error: Avg loss: {test_loss} \n')
@@ -79,7 +69,7 @@ if __name__ == "__main__":
 
     # dimension of the hidden layers
     # layer_channels = [8, 16, 32]
-    z_dim = 100
+    z_dim = 60
 
     CAE_10Kmodel = CAE(z_dim=z_dim)
     CAE_10Kmodel = CAE_10Kmodel.to(device)
@@ -92,19 +82,17 @@ if __name__ == "__main__":
         test_AE(CAE_10Kmodel, Ktest_loader)
 
         torch.save(CAE_10Kmodel.state_dict(), 'model_dicts/CAE_10Kmodel.pth')
-"""
-    train_save = np.array([loss.cpu().detach().numpy() for loss in train_stat])
-    test_save = np.array(losst.cpu().detach().numpy() for losst in test_stat)
-    np.save('model_dicts/train_results', train_save, allow_pickle=False)
-    np.save('model_dicts/test_results', test_save, allow_pickle=False)
+
 
     torch.save(CAE_10Kmodel.state_dict(), 'model_dicts/CAE_10Kmodel.pth')
 
-    plt.plot(np.arange(len(train_save)), train_save, label='train')  # etc.
-    plt.plot(np.arange(len(test_save)), test_save, label='test')
-    plt.xlabel('acummulated batches')
-    plt.ylabel('Loss')
-    plt.title("Train vs Test")
-    plt.legend()
-    plt.savefig(f"results_run-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png")
-"""
+    #np.save('model_dicts/train_results', train_save, allow_pickle=False)
+    #np.save('model_dicts/test_results', test_save, allow_pickle=False)
+
+    #plt.plot(np.arange(len(train_save)), train_save, label='train')  # etc.
+    #plt.plot(np.arange(len(test_save)), test_save, label='test')
+    #plt.xlabel('acummulated batches')
+    #plt.ylabel('Loss')
+    #plt.title("Train vs Test")
+    #plt.legend()
+    #plt.savefig(f"results_run-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png")
