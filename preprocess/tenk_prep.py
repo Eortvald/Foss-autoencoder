@@ -9,7 +9,7 @@ n = 0
 i = 0
 #Path to root of images
 path = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/BlobArchive_v2/'
-savepath = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/tenkblobs/'
+savepath = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/'
 
 #Labels
 df = pd.read_csv('Classifier_labels.csv')
@@ -49,7 +49,11 @@ while n < 10000:
         img = np.pad(img, ((int(rhei2),int(rhei1)), (int(rwid1),int(rwid2)), (0,0)), 'constant')
 
         #Saving edited image.
-        savename = savepath + str(df.iloc[i]['Names'])
+        if n % 5 == 0:
+            folderpath = 'test/'
+        else:
+            folderpath = 'train/'
+        savename = savepath + folderpath + str(df.iloc[i]['Names'])
 
         #Get the label as string (e.g. 'Wheat' or 'Cleaved')
         label = str(df.loc[i][1:8][df.loc[i][1:8] == True]).split(' ')[0]
@@ -59,4 +63,3 @@ while n < 10000:
 
         #Save the image + label
         np.save(savename, img_labeled)
-print(n)
