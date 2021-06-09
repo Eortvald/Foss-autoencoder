@@ -60,6 +60,6 @@ while n < 10000:
 
         #New array that contains image and label
         img_labeled = np.array([img, label], dtype = object)
-
+        print(savename)
         #Save the image + label
         np.save(savename, img_labeled)
