@@ -12,7 +12,7 @@ from torch.optim import lr_scheduler
 from torch.autograd import Variable
 from torch.utils.data import Dataset, DataLoader
 import torchvision
-from torchvision import transforms, datasets, models
+from torchvision import models
 from data.dataload_collection import *
 
 train_dl = Ktrain_loader
