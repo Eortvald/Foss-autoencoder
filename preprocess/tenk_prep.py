@@ -63,4 +63,3 @@ while n < 10000:
         print(savename)
         #Save the image + label
         np.save(savename, img_labeled)
-print(n)

@@ -1,25 +1,17 @@
 import numpy as np
 import torch, torchvision
 from torch import nn
+import datetime
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, TensorDataset
-import datetime
 from os import listdir
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-# PATHS
 PATH_dict = {'10K': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
         'gamer': 'C:/Data/DeepEye/Foss_student/tenkblobs/'}
 
 ### If training on Foss Laptop select '10K'
 ### If training on Gamer select 'gamer'
-PATH = PATH_dict['10K']
-
-# Transforms
-
-
-# Folder loading
+PATH = PATH_dict['gamer']
 
 def npy_dir(path: str, subset: str):
     path = path + subset
@@ -58,24 +50,20 @@ def npy_dir(path: str, subset: str):
     print(f'Dimension of x is :{tx.size()}')
     return tx, ty
 
+
 xtrain, ytrain = npy_dir(PATH, 'train/')
+#xtrain = torch.normal(mean=10, std=2, size=(100, 8, 10, 10))
+#ytrain = torch.normal(mean=2, std=4, size=(100, 8, 10, 10))
 
-xtrain, ytrain = xtrain.to(device), ytrain.to(device)
 
-#train_data = TensorDataset(xtrain, ytrain)
-Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=100, num_workers=0, shuffle=True)
+dataset = TensorDataset(xtrain, ytrain)
+statload = DataLoader(dataset, batch_size=len(dataset), num_workers=8, shuffle=False)
 
-xtest, ytest = npy_dir(PATH, 'test/')
-xtest, ytest = xtest.to(device), ytest.to(device)
-#test_data = TensorDataset(xtest, ytest)
-Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=100, num_workers=0, shuffle=True)
+data = next(iter(statload))
+mean = torch.mean(data[0], dim=(0, 2, 3)).numpy()
+std = torch.std(data[0], dim=(0, 2, 3)).numpy()
 
-if __name__ == "__main__":
-
-    pass
-
-    #for b_index, (X, y) in enumerate(Ktest_loader):
-     #   if b_index % 10 == 0:
-      #      print(f'Batch number:{b_index} | Image:{X[0]}\n Image Label:{y[0]}')
+np.save('10K_mean', mean)
+np.save('10K_std', std)
 
 
