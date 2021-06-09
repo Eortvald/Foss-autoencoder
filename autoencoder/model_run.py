@@ -23,49 +23,53 @@ def train_AE(model, train_loader):
     train_loss = 0
     # print(f'Training on {device}')
 
-    for batch_num, (X, _) in enumerate(train_loader):
+    for batch_num, (X, _) in tqdm(enumerate(train_loader)):
         # Regeneration and loss
-        _ = _.to(device)
         X = X.to(device)
-        X_hat = model(X).to(device)
-        loss = criterion(X_hat, X)
-
-        # Back prop
         optimizer.zero_grad()
+
+        X_hat = model(X)
+        loss = criterion(X_hat, X)
         loss.backward()
         train_loss += loss.item()
         optimizer.step()
 
-        if batch_num % 5 == 0:
+        if batch_num % 10 == 0:
             loss, progress = loss.item(), batch_num * len(X)
             print(f'Batch[{batch_num}] | loss:{loss} ({loss/len(X)}) [{progress}/{size}]')
+            print(10*'##')
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                epoch, batch_num * len(X), len(train_loader.dataset),
+                       100. * batch_num / len(train_loader),
+                       loss.item() / len(X)))
 
     train_loss /= size
     print(f'Train Error: Avg loss: {train_loss}')
 
+    print(10 * '##')
+    print('====> Epoch: {} Average loss: {:.4f}'.format(
+        epoch, train_loss / len(train_loader.dataset)))
+
 
 def test_AE(model, test_loader):
     model.eval()
-    size = len(test_loader.dataset)
-    # print(f'test size:{size}')
     test_loss = 0
 
     with torch.no_grad():
         for i, (X, _) in tqdm(enumerate(test_loader)):
-            _ = _.to(device)
             X = X.to(device)
-            X_hat = model(X).to(device)
+            X_hat = model(X)
             test_loss += criterion(X_hat, X).item()
             loss = criterion(X_hat, X).item()
 
-    test_loss /= size
+    test_loss /= len(test_loader.dataset)
     print(f'Test Error: Avg loss: {test_loss} \n')
 
 
 if __name__ == "__main__":
 
     # b_size =
-    num_epochs = 50
+    num_epochs = 100
     learning_rate = 1e-3
 
     # dimension of the hidden layers
@@ -75,7 +79,7 @@ if __name__ == "__main__":
     CAE_10Kmodel = CAE(z_dim=z_dim)
     CAE_10Kmodel = CAE_10Kmodel.to(device)
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(CAE_10Kmodel.parameters(), lr=learning_rate)
+    optimizer = optim.Adam(CAE_10Kmodel.parameters(), lr=learning_rate, weight_decay=1e-5)
 
     for epoch in range(num_epochs):
         print(f'Epoch {epoch+1} \n---------------------')

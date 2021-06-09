@@ -34,7 +34,9 @@ def stat_npy_dir(path: str, subset: str):
 
     print(f'Done reading {subset} images')
     wx = torch.tensor(data_x, dtype=torch.float)
+    print('Begining permute')
     tx = wx.permute(0, 3, 1, 2)
+    print('Finished permute')
 
     mean = torch.mean(tx, dim=(0, 2, 3)).numpy()
     std = torch.std(tx, dim=(0, 2, 3)).numpy()
