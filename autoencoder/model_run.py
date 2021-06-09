@@ -1,5 +1,6 @@
 import numpy as np
 from datetime import *
+from tqdm import tqdm
 import matplotlib.pyplot as plt
 import torch, torchvision
 from torch import nn, optim
@@ -50,7 +51,7 @@ def test_AE(model, test_loader):
     test_loss = 0
 
     with torch.no_grad():
-        for i, (X, _) in enumerate(test_loader):
+        for i, (X, _) in tqdm(enumerate(test_loader)):
             _ = _.to(device)
             X = X.to(device)
             X_hat = model(X).to(device)
