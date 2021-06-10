@@ -3,7 +3,7 @@ import pickle
 import os
 import datetime
 
-def pickle_to_ndarray(root_path, save_path, n_files = 120000):
+def pickle_to_ndarray(path, save_path, n_files = 120000):
     #Make counter
     n = 0
 
@@ -12,25 +12,28 @@ def pickle_to_ndarray(root_path, save_path, n_files = 120000):
     p_len = len(pickles)
 
     #Create sub-folders so theres 10k in each.
-    subs = []
-    s = -1
     for i in range(n_files//10000):
         sub = os.path.join(save_path + 'a' + str(i))
-        sub.append(subs)
-        os.makedirs(sub)
+        try:
+            os.makedirs(sub)
+        except FileExistsError:
+            print(sub, 'already exists')
+
+    folders = os.listdir(save_path)
+    folder_idx = -1
 
     #Loop that continues until n_files (def = 120.000) is added
-    for file in pickles:
+    for i, file in enumerate(pickles):
         if n == n_files:
             break
 
-        infile = open(file, 'rb')
+        infile = open(path + file, 'rb')
         pic = pickle.load(infile)
         infile.close()
 
-        for j, image in enumerate(pic):
+        print(f'Pickle loaded: [{i}/{p_len}]  ------  {str(datetime.datetime.now())[11:-7]}')
 
-            print(f'Pickle loaded: [{i}/{p_len}]  ------  {str(datetime.datetime.now())[11:-7]}')
+        for image in pic:
 
             if n == n_files:
                 break
@@ -44,11 +47,13 @@ def pickle_to_ndarray(root_path, save_path, n_files = 120000):
 
                 #Saving the image
                 if n % 10000 == 0:
-                    s += 1
-                    print(subs[s], 'is full!')
+                    folder_idx += 1
+                    if folder_idx != 0:
+                        print('folder', folders[folder_idx], 'is full!')
 
-                np.save(save_path + subs[s] + '/grain' + str(n))
                 n += 1
+                np.save(save_path + folders[folder_idx] + '/grain' + str(n), img)
+
 
 
 path = "M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/validation/Images/2018 samples/"
