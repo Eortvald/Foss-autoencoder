@@ -35,7 +35,7 @@ class Mask_n_pad(object):
     """
     Args:
         H, W: for the images
-        (decided from the the biggest image under the 96% threshold)
+        (decided from the the biggest image under the 92% threshold)
     """
     def __init__(self, H, W):
         self.H = H
@@ -43,9 +43,11 @@ class Mask_n_pad(object):
 
     def __call__(self, image):
         """
+
         - Remove background with mask
         - Zeropad images up to the dimension of the biggest images - following the guide lines
         """
+
         img = 'hej'
 
         return img

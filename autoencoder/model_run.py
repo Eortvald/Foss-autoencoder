@@ -5,6 +5,7 @@ import torch, torchvision
 from torch import nn, optim
 from datetime import *
 from torchvision import datasets, transforms
+from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 from CAE_model import *
 from data.dataload_collection import *
@@ -12,6 +13,11 @@ from data.dataload_collection import *
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Using {device} device')
 
+def to_img(x):
+    x = 0.5 * (x + 1)
+    x = x.clamp(0, 1)
+    x = x.view(x.size(0), 1, 28, 28)
+    return x
 
 # Train function
 
@@ -55,6 +61,10 @@ def test_AE(model, test_loader):
     test_loss /= len(test_loader.dataset)
     print(f'\t \t \t Test Error: Avg loss: {test_loss} \n')
 
+    if epoch == 100:
+        pic = to_img(X_hat.cpu().X)
+        save_image(pic, './img/image_{}.png'.format(epoch))
+
     return test_loss
 
 
@@ -84,6 +94,7 @@ if __name__ == "__main__":
         print('\t\t\t>>>>>>>>>>>>>>>>TEST RESULTS<<<<<<<<<<<<<<<<<')
         test_save = test_AE(CAE_10Kmodel, Ktest_loader)
         test_log.append(test_save)
+
 
     print(f'Length of train log: {len(train_log)}')
     print(f'Length of test log: {len(test_log)}')

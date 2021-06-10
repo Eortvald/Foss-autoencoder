@@ -1,5 +1,4 @@
 #Convolutional Autoencoder
-
 import numpy as np
 import matplotlib.pyplot as plt
 import torch, torchvision
@@ -9,14 +8,13 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 from torchinfo import *
 
-
 class CAE(nn.Module):
 
     def __init__(self, z_dim, h_dim: list = [12, 18, 24]):
         super(CAE, self).__init__()
 
 
-        # Encoder setup
+        #================================ Encoder ==============================#
         self.encoder = nn.Sequential(
             nn.Conv2d(8, 12, kernel_size=5, stride=3, padding=0, bias = False),
             nn.BatchNorm2d(12),
@@ -27,16 +25,15 @@ class CAE(nn.Module):
             nn.Conv2d(18, 24, kernel_size=4, stride=2, padding=1, bias = False),
             nn.BatchNorm2d(24),
             nn.ReLU(True),
-            nn.Flatten(),
-
-
+            nn.Flatten()
         )
 
+        # ============ Z layer ============#
         self.fcZ = nn.Linear(2688,z_dim)
 
-        self.decoder_brigde = nn.Linear(z_dim, 2688)
 
-        # Decoder setup
+        #================================ Decoder ==============================#
+        self.decoder_brigde = nn.Linear(z_dim, 2688)
         self.decoder = nn.Sequential(
             nn.Unflatten(1,(24,16,7)),
             nn.ConvTranspose2d(24, 18, 4, stride=2, padding=1, bias = False),
@@ -60,20 +57,6 @@ class CAE(nn.Module):
         return decode_out
 
     def forward(self, x):
-
         Z = self.encode(x)
-
         X_hat = self.decode(Z)
         return X_hat
-
-
-
-
-if __name__ == "__main__":
-    pass
-    #summodel = CAE(30)
-
-    #print(summary(summodel, input_size=(128,8,200,89), col_names=["input_size","output_size","kernel_size", "num_params"]))
-    # Script in under this statement will only be run when this file is executed
-    # If you import and run this file from another script,
-    # the interpreter will ignore function call made in this statement
