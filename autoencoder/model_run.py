@@ -108,12 +108,12 @@ if __name__ == "__main__":
     #np.save('model_dicts/train_results', train_save, allow_pickle=False)
     # np.save('model_dicts/test_results', test_save, allow_pickle=False)
 
-    plt.plot(np.arange(len(train_log)), train_log, label='Train')  # etc.
+    plt.plot(np.arange(len(train_log)), train_log, label='Train')
     plt.plot(np.arange(len(test_log)), test_log, label='Test')
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
     plt.title("Train vs Test")
     plt.legend()
     abspath = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/Foss-autoencoder/plots/autoencoder-plots/'
-    plt.savefig(f"{abspath}results_run-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png")
-    plt.savefig(f"results_run-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png")
+    plt.savefig(f"{abspath}CAE_10K_Results-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png")
+
