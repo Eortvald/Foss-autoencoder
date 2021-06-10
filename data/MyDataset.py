@@ -30,4 +30,4 @@ class MyDataset(datasets):
 
 
 dset = MyDataset()
-loader = torch.utils.DataLoader(dset, num_workers = 8)
+loader = DataLoader(dset, num_workers = 8)
