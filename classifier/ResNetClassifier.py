@@ -1,4 +1,6 @@
+"""
 from os import listdir
+from data.dataload_collection import *
 import numpy as np
 import torch
 import torch.nn as nn
@@ -14,12 +16,12 @@ num_epochs = 2
 learning_rate = 0.001
 
 # Image preprocessing modules
-transform = transforms.Compose([
-    transforms.Pad(4),
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomCrop(32),
-    transforms.ToTensor()])
-"""
+#transform = transforms.Compose([
+#    transforms.Pad(4),
+#    transforms.RandomHorizontalFlip(),
+#    transforms.RandomCrop(32),
+#    transforms.ToTensor()])
+
 # CIFAR-10 dataset
 train_dataset = torchvision.datasets.CIFAR10(root='../../data/',
                                              train=True,
@@ -29,32 +31,19 @@ train_dataset = torchvision.datasets.CIFAR10(root='../../data/',
 test_dataset = torchvision.datasets.CIFAR10(root='../../data/',
                                             train=False,
                                             transform=transforms.ToTensor())
-"""
-#10kBlobDataset
-path = 'M:\\R&D\Technology access controlled\Projects access controlled\AIFoss\Data\Foss_student\\tenkblobs'
-train_datasetx ={path:np.load(path) for path in listdir(path) if path}
-    #np.load(path+'\\train'+'name',allow_picke = True)
-train_datasety = np.load
-test_datasetx
-test_datasety
-test_dataset =
-
-#Tensor Train
-tensor_x = torch.Tensor(train_datasetx)
-tensor_y = torch.Tensor(train_datasety)
-#Tensor Test
-tensor_xt = torch.Tensor(test_datasetx)
-tensor_yt = torch.Tensor(test_datasety)
+#10kBlobDatase
 # Data loader
-train_dataset = TensorDataset(tensor_x,tensor_y)
-test_dataset = TensorDataset(tensor_xt, tensor_yt)
-train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
-                                           batch_size=100,
-                                           shuffle=True)
+#train_dataset = TensorDataset(tensor_x,tensor_y)
+#test_dataset = TensorDataset(tensor_xt, tensor_yt)
+train_loader = Ktrain_loader
+test_loader = Ktest_loader
+#train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
+#                                           batch_size=100,
+#                                           shuffle=True)
 
-test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
-                                          batch_size=100,
-                                          shuffle=False)
+#test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
+#                                          batch_size=100,
+#                                          shuffle=False)
 
 # 3x3 convolution
 def conv3x3(in_channels, out_channels, stride=1):
@@ -87,10 +76,10 @@ class ResidualBlock(nn.Module):
 
 # ResNet
 class ResNet(nn.Module):
-    def __init__(self, block, layers, num_classes=10):
+    def __init__(self, block, layers, num_classes=7):
         super(ResNet, self).__init__()
         self.in_channels = 16
-        self.conv = conv3x3(3, 16)
+        self.conv = conv3x3(8, 16)
         self.bn = nn.BatchNorm2d(16)
         self.relu = nn.ReLU(inplace=True)
         self.layer1 = self.make_layer(block, 16, layers[0])
@@ -179,3 +168,4 @@ with torch.no_grad():
         correct += (predicted == labels).sum().item()
 
     print('Accuracy of the model on the test images: {} %'.format(100 * correct / total))
+"""
