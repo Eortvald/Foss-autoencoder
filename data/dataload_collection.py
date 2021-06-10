@@ -12,11 +12,13 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # PATHS
 PATH_dict = {
     '10K': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
-    'gamer': 'C:/Data/DeepEye/Foss_student/tenkblobs/'}
+    'gamer': 'C:/Data/DeepEye/Foss_student/tenkblobs/',
+    '224' : 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/'
+}
 
 ### If training on Foss Laptop select '10K'
 ### If training on Gamer select 'gamer'
-PATH = PATH_dict['gamer']
+PATH = PATH_dict['224']
 
 # Transforms
 MEAN_8ch = np.load('10K_mean.npy')
