@@ -41,16 +41,45 @@ class Mask_n_pad(object):
         self.H = H
         self.W = W
 
-    def __call__(self, image):
+    def __call__(self, img):
         """
-
+        - Crop image if too large
         - Remove background with mask
         - Zeropad images up to the dimension of the biggest images - following the guide lines
         """
 
-        img = 'hej'
+        # Apply mask
+        mask = img[:, :, 7]
+        img = np.where(mask[..., None] != 0, img, [0, 0, 0, 0, 0, 0, 0, 0])
 
-        return img
+        # width and height of image
+        h = np.shape(img[:, :, 0])[0]
+        w = np.shape(img[:, :, 0])[1]
+
+        # Trim/Crop if image is too large
+        if h > self.H:
+            img = np.delete(img, np.where(np.sum(mask, axis=0) == 0)[0], axis=0)
+
+        if w > self.W:
+            img = np.delete(img, np.where(np.sum(mask, axis=1) == 0)[0], axis=1)
+
+        if (h % 2) == 0:
+            rh1 = (self.H - h) / 2
+            rh2 = (self.H - h) / 2
+        elif (h % 2) == 1:
+            rh1 = (self.H - h + 1) / 2
+            rh2 = (self.H - h - 1) / 2
+        if (w % 2) == 0:
+            rw1 = (self.W - w) / 2
+            rw2 = (self.W - w) / 2
+        elif (w % 2) == 1:
+            rw1 = (self.W - w + 1) / 2
+            rw2 = (self.W - w - 1) / 2
+
+        # Zero padding
+        return np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
+
+
 
 
 
