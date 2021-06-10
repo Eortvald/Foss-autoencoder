@@ -22,7 +22,7 @@ class ANN(Module):
     def __init__(self, n_inputs):
         super(ANN, self).__init__()
         self.hidden1 = Linear(n_inputs, hidden_out[0])
-        self.af1 = Relu()
+        self.af1 = ReLU()
         self.hidden2 = Linear(hidden_out[0],hidden_out[1])
         self.af2 = ReLU()
         self.hidden3 = Linear(hidden_out[1],hidden_out[2])

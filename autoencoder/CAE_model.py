@@ -33,7 +33,7 @@ class CAE(nn.Module):
 
 
         #================================ Decoder ==============================#
-        self.decoder_bridge = nn.Linear(z_dim, 2688)
+        self.decoder_brigde = nn.Linear(z_dim, 2688)
         self.decoder = nn.Sequential(
             nn.Unflatten(1,(24,16,7)),
             nn.ConvTranspose2d(24, 18, 4, stride=2, padding=1, bias = False),
@@ -52,7 +52,7 @@ class CAE(nn.Module):
         return Z
 
     def decode(self, Z):
-        Z = self.decoder_bridge(Z)
+        Z = self.decoder_brigde(Z)
         decode_out = self.decoder(Z)
         return decode_out
 
