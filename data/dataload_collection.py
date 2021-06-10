@@ -45,7 +45,7 @@ def npy_dir(path: str, subset: str):
     data_x = []
     data_y = []
 
-    folder = listdir(path)
+    folder = listdir(path)   # Insert [:100]
     folder_images = len(folder)
     for i, NPY in enumerate(folder):
 
