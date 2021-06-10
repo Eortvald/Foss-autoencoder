@@ -24,7 +24,6 @@ class ANN(nn.Module):
         self.af2 = nn.ReLU()
         self.hidden3 = nn.Linear(hidden_out[1], hidden_out[2])
         self.af3 = nn.ReLU()
-        self.hidden4 = nn.Linear(hidden_out[2], hidden_out[3])
 
     def forward(self, X):
         X = self.hidden1(X)
@@ -33,8 +32,6 @@ class ANN(nn.Module):
         X = self.af2(X)
         X = self.hidden3(X)
         X = self.af3(X)
-        # last layer and output
-        X = self.hidden4(X)
         return X
 
 
