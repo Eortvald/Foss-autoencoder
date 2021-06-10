@@ -170,11 +170,9 @@ with torch.no_grad():
     print('Accuracy of the model on the test images: {} %'.format(100 * correct / total))
 """
 
-# %%
-% matplotlib
-inline
 from __future__ import print_function
 from __future__ import division
+from data.dataload_collection import *
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -186,15 +184,9 @@ import time
 import os
 import copy
 
-print("PyTorch Version: ", torch.__version__)
-print("Torchvision Version: ", torchvision.__version__)
-
-# %%
-
 # Top level data directory. Here we assume the format of the directory conforms
 #   to the ImageFolder structure
-data_dir = "M:/R&D&/Technology access controlled/ Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/"
-
+data_dir = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/'
 # Models to choose from [resnet, alexnet, vgg, squeezenet, densenet, inception]
 model_name = "resnet"
 
@@ -316,7 +308,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     if model_name == "resnet":
         """ Resnet18
         """
-        model_ft = models.resnet18(pretrained=use_pretrained)
+        model_ft = models.resnet18(pretrained=use_pretrained,)
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs, num_classes)
@@ -407,12 +399,15 @@ data_transforms = {
 print("Initializing Datasets and Dataloaders...")
 
 # Create training and validation datasets
-image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['train', 'val']}
+#image_datasets = {x: datasets.DatasetFolder(extensions=['.npy'],os.path.join(data_dir, x), data_transforms[x]) for x in ['train', 'val']}
 # Create training and validation dataloaders
+#dataloaders_dict = {
+#    x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4) for x in
+#    ['train', 'val']}
 dataloaders_dict = {
-    x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4) for x in
-    ['train', 'val']}
-
+    'train': torch.utils.data.DataLoader(Ktrain_loader),
+    'val': torch.utils.data.DataLoader(Ktest_loader)
+}
 # Detect if we have a GPU available
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
