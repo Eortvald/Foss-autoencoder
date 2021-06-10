@@ -38,8 +38,8 @@ def stat_npy_dir(path: str, subset: str):
     tx = wx.permute(0, 3, 1, 2)
     print('Finished permute')
 
-    mean = torch.mean(tx, dim=(0, 2, 3)).numpy()
-    std = torch.std(tx, dim=(0, 2, 3)).numpy()
+    mean = torch.mean(tx, dim=(0, 2, 3))
+    std = torch.std(tx, dim=(0, 2, 3))
 
     np.save('10K_mean', mean)
     np.save('10K_std', std)
