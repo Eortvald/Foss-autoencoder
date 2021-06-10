@@ -22,13 +22,13 @@ def _load_pickle_file(path):
     return images
 
 
-def _make_data_list(root_path):
+def _make_data_list(root_path: str):
     folders = os.listdir(root_path)
     data_list = list(str())
     for folder in folders:
         with os.scandir(root_path + folder) as entries:
             for entry in entries:
-                data_list.append(folder + entry.name.split(".")[0] + '.npy')
+                data_list.append(root_path + folder + entry.name.split(".")[0] + '.npy')
     return data_list
 
 class Mask_n_pad(object):
@@ -52,16 +52,15 @@ class Mask_n_pad(object):
         mask = img[:, :, 7]
         img = np.where(mask[..., None] != 0, img, [0, 0, 0, 0, 0, 0, 0, 0])
 
-        # width and height of image
-        h = np.shape(img[:, :, 0])[0]
+        # Trim/Crop if image
+        img = np.delete(img, np.where(np.sum(mask, axis=1) == 0)[0], axis=0)
+        h = np.shape(img[:, :, 7])[0]
+        img = np.delete(img, np.where(np.sum(mask, axis=0) == 0)[0], axis=1)
         w = np.shape(img[:, :, 0])[1]
 
-        # Trim/Crop if image is too large
-        if h > self.H:
-            img = np.delete(img, np.where(np.sum(mask, axis=0) == 0)[0], axis=0)
-
-        if w > self.W:
-            img = np.delete(img, np.where(np.sum(mask, axis=1) == 0)[0], axis=1)
+        if (w > 80) or (h > 180):
+            print('Image is too large. Larger than width:', self.W, 'or height', self.H)
+            raise Exception
 
         if (h % 2) == 0:
             rh1 = (self.H - h) / 2
