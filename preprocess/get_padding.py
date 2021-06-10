@@ -1,6 +1,6 @@
 import numpy as np
 
-def get_padded_and_masked_image(img, max_h = 190, max_w = 80):
+def get_padded_and_masked_image(img, max_h = 180, max_w = 80):
     #Apply mask
     mask = img[:, :, 7]
     img = np.where(mask[..., None] != 0, img, [0, 0, 0, 0, 0, 0, 0, 0])

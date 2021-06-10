@@ -6,20 +6,27 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Dataset
 import os
 from dataload_collection import PATH_dict
+import pickle
 
 #PATH = PATH_dict['']    # add 2017 to mother dict first
 PATH = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
 
 
-def _load_kernel_file(path):
+def _load_pickle_file(path):
+    infile = open(path, 'rb')
+    pic = pickle.load(infile)
+    infile.close()
+    images = np.ones(len(pic), dtype = object)
+    for i, image in enumerate(pic):
+        images[i] = image['image']
+    return images
 
-    picklefile = open(pickle my ass path )
-    return picklfile
-    folders = os.listdir(path)
+
+def _make_data_list(root_path):
+    folders = os.listdir(root_path)
     data_list = list(str())
     for folder in folders:
-        print(path + folder)
-        with os.listdir(path + folder) as entries:
+        with os.scandir(root_path + folder) as entries:
             for entry in entries:
                 data_list.append(folder + entry.name.split(".")[0] + '.npy')
     return data_list
@@ -50,7 +57,7 @@ T = transforms.Compose([Mask_n_pad(H=200,W=89),transforms.ToTensor(),transforms.
 class KornDataset(Dataset):
 
     def __init__(self, data_path,  label_path = None, transform = None):
-        self.data_files = os.listdir(data_path)
+        self.data_files = _make_data_list(data_path)
         self.labels = pd.read_csv(label_path)
         self.transform = transform
 
