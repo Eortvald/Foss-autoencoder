@@ -18,7 +18,7 @@ PATH_dict = {
 
 ### If training on Foss Laptop select '10K'
 ### If training on Gamer select 'gamer'
-PATH = PATH_dict['224']
+PATH = PATH_dict['gamer']
 
 # Transforms
 MEAN_8ch = np.load('10K_mean.npy')
@@ -47,7 +47,7 @@ def npy_dir(path: str, subset: str):
     data_x = []
     data_y = []
 
-    folder = listdir(path)   # Insert [:100]
+    folder = listdir(path)[:100]
     folder_images = len(folder)
     for i, NPY in enumerate(folder):
 
@@ -65,7 +65,7 @@ def npy_dir(path: str, subset: str):
     print('Beginning permute')
     tx = wx.permute(0, 3, 1, 2)
     print('Finished permute')
-    ty = torch.tensor(data_y, dtype=torch.float)
+    ty = torch.tensor(data_y, dtype=torch.long)
     print(f'Dimension of X is :{tx.size()}')
     print(tx[0])
     print('Beginning Norm transform')
@@ -77,10 +77,10 @@ def npy_dir(path: str, subset: str):
 
 
 xtrain, ytrain = npy_dir(PATH, 'train/')
-Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=100, num_workers=0, shuffle=True)
+Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=10, num_workers=0, shuffle=True)
 
 xtest, ytest = npy_dir(PATH, 'test/')
-Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=100, num_workers=0, shuffle=True)
+Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=10, num_workers=0, shuffle=True)
 
 if __name__ == "__main__":
     pass
