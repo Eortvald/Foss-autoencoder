@@ -15,7 +15,7 @@ testdataloader = Ktest_loader
 
 class ANN(nn.Module):
 
-    def __init__(self, n_inputs):
+    def __init__(self, n_inputs, hidden_out):
         super(ANN, self).__init__()
 
         self.hidden1 = nn.Linear(n_inputs, hidden_out[0])
@@ -36,8 +36,11 @@ class ANN(nn.Module):
         X = self.af3(X)
         # last layer and output
         X = self.hidden4(X)
-        X = self.af4(X)
+        # X = self.af4(X)  #Disabled soft max!
         return X
+
+
+learningrate = 0.001
 
 
 # train model
@@ -45,14 +48,14 @@ def train_model(traindataloader, model, ENC):
     # Optimizing
     train_loss = 0
     dataset_size = len(traindataloader.dataset)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(model.parameters(), lr=learningrate, momentum=0.9)
 
     for i, (inputs, targets) in enumerate(traindataloader):
-
-        #ENCODER HERE
+        # ENCODER HERE
         inputs = inputs.to(device)
-        inputs = ENC(inputs)
-        if epoch % 10 == 0:
-            print(inputs)
+        inputs = ENC(inputs).to(device)
+        print(inputs)
 
         optimizer.zero_grad()
         yhat = model(inputs)
@@ -66,42 +69,36 @@ def train_model(traindataloader, model, ENC):
 
 
 # test model
+
 def model_evaluate(testdataloader, model, ENC):
     dataset_size = len(traindataloader.dataset)
-    predictions, labels = list(), list()
     test_loss = 0
+    criterion = nn.CrossEntropyLoss()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for i, (inputs, label) in enumerate(testdataloader):
+            # Evaluating model on test set
+            # ENCODER HERE
+            inputs = inputs.to(device)
+            inputs = ENC(inputs).to(device)
+            yhat = model(inputs)
+            # Purely for print statement
+            loss = criterion(yhat, label)
+            test_loss += loss.item()
 
-    for i, (inputs, label) in enumerate(testdataloader):
-        # Evaluating model on test set
-        #ENCODER HERE
-        inputs = inputs.to(device)
-        inputs = ENC(inputs)
+            _, yhat = torch.max(yhat, 1)
 
-        yhat = model(inputs)
-        loss = criterion(yhat, label)
-        test_loss += loss.item()
+            for label, prediction in zip(label, yhat):
+                if label == yhat:
+                    correct += 1
+                total += 1
 
-         # Converting to class labels
-        yhat = np.argmax(yhat, axis=1)
-        print(f'yhat after argmax: {yhat}')
-        # Reshaping
-
-        yhat = yhat.reshape((len(yhat), 1))
-        print(f'yhat after reshape: {yhat}')
-        label = label.reshape((len(label), 1))
-        # Lists
-        predictions.append(yhat)
-        labels.append(label)
-
-    predictions, labels = np.vstack(predictions), np.vstack(labels)
-    print(f'preditions vstack : {predictions}')
+    ACC = 100 * float(correct) / total
 
     # Accuracy calculation and print
     test_loss /= dataset_size
-    print(f'Avg. test loss {test_loss}')
-    accuracy = accuracy_score(labels, predictions)
-    return accuracy
-
+    print(f'Avg. test loss {test_loss}  | Accuray: {ACC}')
 
 
 if __name__ == "__main__":
@@ -119,5 +116,4 @@ if __name__ == "__main__":
         train_model(traindataloader, model, ENC=None)
 
         print('\t\t\t>>>>>>>>>>>>>>>>TEST RESULTS<<<<<<<<<<<<<<<<<')
-        acc = model_evaluate(testdataloader, model, ENC=None)
-        print('Accuracy: %.4f' % acc)
+        model_evaluate(testdataloader, model, ENC=None)
