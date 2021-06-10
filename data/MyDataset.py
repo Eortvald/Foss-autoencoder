@@ -2,8 +2,7 @@ import numpy as np
 import torch, torchvision
 from torch import nn
 from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
-from torch.utils import Dataset
+from torch.utils.data import DataLoader, datasets
 import os
 
 path = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
@@ -18,7 +17,7 @@ def _load_kernel_file(path):
                 data_list.append(folder + entry.name.split(".")[0] + '.npy')
     return data_list
 
-class MyDataset(torch.utils.Dataset):
+class MyDataset(datasets):
     def __init__(self):
         self.data_files = _load_kernel_file(path)
         self.data_files = np.sort(self.data_files)
