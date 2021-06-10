@@ -25,7 +25,6 @@ class ANN(nn.Module):
         self.hidden3 = nn.Linear(hidden_out[1], hidden_out[2])
         self.af3 = nn.ReLU()
         self.hidden4 = nn.Linear(hidden_out[2], hidden_out[3])
-        self.af4 = nn.Softmax()
 
     def forward(self, X):
         X = self.hidden1(X)
@@ -36,7 +35,6 @@ class ANN(nn.Module):
         X = self.af3(X)
         # last layer and output
         X = self.hidden4(X)
-        # X = self.af4(X)  #Disabled soft max!
         return X
 
 
@@ -51,21 +49,26 @@ def train_model(traindataloader, model, ENC):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=learningrate, momentum=0.9)
 
-    for i, (inputs, targets) in enumerate(traindataloader):
+    for i, (inputs, label) in enumerate(traindataloader):
         # ENCODER HERE
         inputs = inputs.to(device)
+        label = label.to(device)
         inputs = ENC(inputs).to(device)
-        print(inputs)
+        # print(inputs)
 
         optimizer.zero_grad()
         yhat = model(inputs)
-        loss = criterion(yhat, targets)
+        # print(f'yhat:{yhat}\n')
+        # print(f'label: {label}')
+        loss = criterion(yhat, label)
         train_loss += loss.item()
         loss.backward()
         optimizer.step()
 
     train_loss /= dataset_size
     print(f'Avg train loss: {train_loss}')
+
+    return train_loss
 
 
 # test model
@@ -80,6 +83,7 @@ def model_evaluate(testdataloader, model, ENC):
         for i, (inputs, label) in enumerate(testdataloader):
             # Evaluating model on test set
             # ENCODER HERE
+            label = label.to(device)
             inputs = inputs.to(device)
             inputs = ENC(inputs).to(device)
             yhat = model(inputs)
@@ -89,8 +93,9 @@ def model_evaluate(testdataloader, model, ENC):
 
             _, yhat = torch.max(yhat, 1)
 
-            for label, prediction in zip(label, yhat):
-                if label == yhat:
+            for la, pre in zip(label.detach().cpu().numpy(), yhat.detach().cpu().numpy()):
+
+                if la == pre:
                     correct += 1
                 total += 1
 
@@ -100,9 +105,12 @@ def model_evaluate(testdataloader, model, ENC):
     test_loss /= dataset_size
     print(f'Avg. test loss {test_loss}  | Accuray: {ACC}')
 
+    return test_loss
+
 
 if __name__ == "__main__":
 
+### This code is broken - see main for working version
     model = ANN(30)
     model = model.to(device)
     learningrate = 0.001  # Insert LR
@@ -113,7 +121,7 @@ if __name__ == "__main__":
 
     for epoch in range(epochs):
         print(f'\n\t\t------------------------------Epoch: {epoch + 1}------------------------------')
-        train_model(traindataloader, model, ENC=None)
+        tr_loss = train_model(traindataloader, model, ENC=None)
 
         print('\t\t\t>>>>>>>>>>>>>>>>TEST RESULTS<<<<<<<<<<<<<<<<<')
         model_evaluate(testdataloader, model, ENC=None)

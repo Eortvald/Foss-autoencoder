@@ -65,7 +65,7 @@ def npy_dir(path: str, subset: str):
     print('Beginning permute')
     tx = wx.permute(0, 3, 1, 2)
     print('Finished permute')
-    ty = torch.tensor(data_y, dtype=torch.float)
+    ty = torch.tensor(data_y, dtype=torch.long)
     print(f'Dimension of X is :{tx.size()}')
     print(tx[0])
     print('Beginning Norm transform')
