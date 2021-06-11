@@ -48,7 +48,7 @@ def buildResNet50Model(numClasses):
 
     return model
 # end function
-def train_model(model, dataloaders, criterion, optimizer, num_epochs, is_inception=False):
+def train_model(model, dataloaders, criterion, optimizer, num_epochs):
     since = time.time()
 
     val_acc_history = []
@@ -82,20 +82,10 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs, is_incepti
                 # track history if only in train
                 with torch.set_grad_enabled(phase == 'train'):
                     # Get model outputs and calculate loss
-                    # Special case for inception because in training it has an auxiliary output. In train
-                    #   mode we calculate the loss by summing the final output and the auxiliary output
-                    #   but in testing we only consider the final output.
-                    if is_inception and phase == 'train':
-                        # From https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958
-                        outputs, aux_outputs = model(inputs)
-                        loss1 = criterion(outputs, labels)
-                        loss2 = criterion(aux_outputs, labels)
-                        loss = loss1 + 0.4 * loss2
-                    else:
-                        outputs = model(inputs)
-                        loss = criterion(outputs, labels)
+                    outputs = model(inputs)
+                    loss = criterion(outputs, labels)
 
-                    _, preds = torch.max(outputs, 1)
+                    preds = torch.max(outputs, 1)
 
                     # backward + optimize only if in training phase
                     if phase == 'train':
@@ -150,11 +140,6 @@ print(device)
 
 model_ft = model_ft.to(device)
 
-# Gather the parameters to be optimized/updated in this run. If we are
-#  finetuning we will be updating all parameters. However, if we are
-#  doing feature extract method, we will only update the parameters
-#  that we have just initialized, i.e. the parameters with requires_grad
-#  is True.
 params_to_update = model_ft.parameters()
 print("Params to learn:")
 if feature_extract:
@@ -172,8 +157,4 @@ else:
 optimizer_ft = optim.SGD(params_to_update, lr=0.001, momentum=0.9)
 
 criterion = nn.CrossEntropyLoss()
-model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=False))
-
-
-model = buildResNet50Model(7)
-model = model.to(device)
+model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs)
