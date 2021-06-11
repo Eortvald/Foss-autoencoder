@@ -43,7 +43,7 @@ class Mask_n_pad(object):
 
     def __call__(self, img):
         """
-        - Crop image if too large
+        - Crop image
         - Remove background with mask
         - Zeropad images up to the dimension of the biggest images - following the guide lines
         """
@@ -52,15 +52,14 @@ class Mask_n_pad(object):
         mask = img[:, :, 7]
         img = np.where(mask[..., None] != 0, img, [0, 0, 0, 0, 0, 0, 0, 0])
 
-        # Trim/Crop if image
+        # Trim/Crop image
         img = np.delete(img, np.where(np.sum(mask, axis=1) == 0)[0], axis=0)
         h = np.shape(img[:, :, 7])[0]
         img = np.delete(img, np.where(np.sum(mask, axis=0) == 0)[0], axis=1)
         w = np.shape(img[:, :, 0])[1]
 
         if (w > 80) or (h > 180):
-            print('Image is too large. Larger than width:', self.W, 'or height', self.H)
-            raise Exception
+            raise Exception('Image is too large. Larger than width:', self.W, 'or height', self.H)
 
         if (h % 2) == 0:
             rh1 = (self.H - h) / 2
@@ -98,7 +97,7 @@ class KornDataset(Dataset):
         label = None
 
         if self.labels:
-            label =  self.labels.iloc[index,1]  # retrive the label coresponding to the image
+            label = self.labels.iloc[index,1]  # retrive the label coresponding to the image
 
         if self.transform:
             img = self.transform(img)
