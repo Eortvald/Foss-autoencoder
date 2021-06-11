@@ -14,6 +14,7 @@ PATH_dict = {
     '10K': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
     'gamer': 'C:/Data/DeepEye/Foss_student/tenkblobs/',
     '224' : 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/'
+    'validation': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_grain/'
 }
 
 ### If training on Foss Laptop select '10K'
@@ -47,7 +48,7 @@ def npy_dir(path: str, subset: str):
     data_x = []
     data_y = []
 
-    folder = listdir(path)[:100]
+    folder = listdir(path)
     folder_images = len(folder)
     for i, NPY in enumerate(folder):
 
@@ -77,10 +78,10 @@ def npy_dir(path: str, subset: str):
 
 
 xtrain, ytrain = npy_dir(PATH, 'train/')
-Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=10, num_workers=0, shuffle=True)
+Ktrain_loader = DataLoader(TensorDataset(xtrain, ytrain), batch_size=100, num_workers=0, shuffle=True)
 
 xtest, ytest = npy_dir(PATH, 'test/')
-Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=10, num_workers=0, shuffle=True)
+Ktest_loader = DataLoader(TensorDataset(xtest, ytest), batch_size=100, num_workers=0, shuffle=True)
 
 if __name__ == "__main__":
     pass

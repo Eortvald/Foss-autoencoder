@@ -22,13 +22,13 @@ def _load_pickle_file(path):
     return images
 
 
-def _make_data_list(root_path):
+def _make_data_list(root_path: str):
     folders = os.listdir(root_path)
     data_list = list(str())
     for folder in folders:
         with os.scandir(root_path + folder) as entries:
             for entry in entries:
-                data_list.append(folder + entry.name.split(".")[0] + '.npy')
+                data_list.append(root_path + folder + entry.name.split(".")[0] + '.npy')
     return data_list
 
 class Mask_n_pad(object):
@@ -41,16 +41,43 @@ class Mask_n_pad(object):
         self.H = H
         self.W = W
 
-    def __call__(self, image):
+    def __call__(self, img):
         """
-
+        - Crop image
         - Remove background with mask
         - Zeropad images up to the dimension of the biggest images - following the guide lines
         """
 
-        img = 'hej'
+        # Apply mask
+        mask = img[:, :, 7]
+        img = np.where(mask[..., None] != 0, img, [0, 0, 0, 0, 0, 0, 0, 0])
 
-        return img
+        # Trim/Crop image
+        img = np.delete(img, np.where(np.sum(mask, axis=1) == 0)[0], axis=0)
+        h = np.shape(img[:, :, 7])[0]
+        img = np.delete(img, np.where(np.sum(mask, axis=0) == 0)[0], axis=1)
+        w = np.shape(img[:, :, 0])[1]
+
+        if (w > 80) or (h > 180):
+            raise Exception('Image is too large. Larger than width:', self.W, 'or height', self.H)
+
+        if (h % 2) == 0:
+            rh1 = (self.H - h) / 2
+            rh2 = (self.H - h) / 2
+        elif (h % 2) == 1:
+            rh1 = (self.H - h + 1) / 2
+            rh2 = (self.H - h - 1) / 2
+        if (w % 2) == 0:
+            rw1 = (self.W - w) / 2
+            rw2 = (self.W - w) / 2
+        elif (w % 2) == 1:
+            rw1 = (self.W - w + 1) / 2
+            rw2 = (self.W - w - 1) / 2
+
+        # Zero padding
+        return np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
+
+
 
 
 
@@ -70,7 +97,7 @@ class KornDataset(Dataset):
         label = None
 
         if self.labels:
-            label =  self.labels.iloc[index,1]  # retrive the label coresponding to the image
+            label = self.labels.iloc[index,1]  # retrive the label coresponding to the image
 
         if self.transform:
             img = self.transform(img)
