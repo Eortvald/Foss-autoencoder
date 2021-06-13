@@ -8,7 +8,7 @@ import os
 from dataload_collection import PATH_dict
 import pickle
 
-#PATH = PATH_dict['']    # add 2017 to mother dict first
+# PATH = PATH_dict['']    # add 2017 to mother dict first
 PATH = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
 
 
@@ -16,7 +16,7 @@ def _load_pickle_file(path):
     infile = open(path, 'rb')
     pic = pickle.load(infile)
     infile.close()
-    images = np.ones(len(pic), dtype = object)
+    images = np.ones(len(pic), dtype=object)
     for i, image in enumerate(pic):
         images[i] = image['image']
     return images
@@ -31,12 +31,14 @@ def _make_data_list(root_path: str):
                 data_list.append(root_path + folder + entry.name.split(".")[0] + '.npy')
     return data_list
 
+
 class Mask_n_pad(object):
     """
     Args:
         H, W: for the images
         (decided from the the biggest image under the 92% threshold)
     """
+
     def __init__(self, H, W):
         self.H = H
         self.W = W
@@ -78,18 +80,17 @@ class Mask_n_pad(object):
         return np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
 
 
+T = transforms.Compose([Mask_n_pad(H=200, W=89),
+                        transforms.ToTensor(),
+                        transforms.Normalize(mean=[1, 1, 1, 1, 1, 1, 1], std=[1, 1, 1, 1, 1, 1, 1])])
 
-
-
-T = transforms.Compose([Mask_n_pad(H=200,W=89),transforms.ToTensor(),transforms.Normalize(mean=[1,1,1,1,1,1,1],std=[1,1,1,1,1,1,1])])
 
 class KornDataset(Dataset):
 
-    def __init__(self, data_path,  label_path = None, transform = None):
+    def __init__(self, data_path, label_path=None, transform=None):
         self.data_files = _make_data_list(data_path)
         self.labels = pd.read_csv(label_path)
         self.transform = transform
-
 
     def __getitem__(self, index):
         img = np.load(self.data_files[index])
@@ -97,20 +98,17 @@ class KornDataset(Dataset):
         label = None
 
         if self.labels:
-            label = self.labels.iloc[index,1]  # retrive the label coresponding to the image
+            label = self.labels.iloc[index, 1]  # retrive the label coresponding to the image
 
         if self.transform:
             img = self.transform(img)
 
-
-
         return img, label
-
-
 
     def __len__(self):
         return len(self.data_files)
 
 
-Dataset = KornDataset(data_path='...',  label_path = '...', transform = T)  # the dataset object can be indexed like a regular list
+Dataset = KornDataset(data_path='...', label_path='...',
+                      transform=T)  # the dataset object can be indexed like a regular list
 loader = DataLoader(Dataset, num_workers=8)
