@@ -108,6 +108,16 @@ def model_evaluate(testdataloader, model, ENC):
 
 if __name__ == "__main__":
 
+    X = torch.ones([1, 8, 200, 89]).to(device)
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    aemodel = CAE(z_dim=30).to(device)
+    aemodel.load_state_dict(torch.load('./autoencoder/model_dicts/CAE_10Kmodel.pth', map_location=device))
+    aemodel.eval()
+
+    ENCO = lambda img: aemodel.encode(img)
+    print(ENCO(X))
+
+
     hidden_out = [8, 10, 8]
     ANN_10Kmodel = ANN(30, hidden_out)
     ANN_10Kmodel = ANN_10Kmodel.to(device)
