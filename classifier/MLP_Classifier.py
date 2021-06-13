@@ -107,7 +107,7 @@ def model_evaluate(testdataloader, model, ENC):
 
 if __name__ == "__main__":
 
-#hidden_out = [8, 10, 8]
+hidden_out = [8, 10, 8]
 ANN_10Kmodel = ANN(30, hidden_out)
 ANN_10Kmodel = ANN_10Kmodel.to(device)
 learningrate = 0.001  # Insert LR
