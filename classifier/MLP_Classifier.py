@@ -115,7 +115,6 @@ if __name__ == "__main__":
     aemodel.eval()
 
     ENCO = lambda img: aemodel.encode(img)
-    print(ENCO(X))
 
 
     hidden_out = [8, 10, 8]
@@ -145,4 +144,4 @@ if __name__ == "__main__":
     plt.ylabel('Loss')
     plt.title("Train vs Test loss")
     plt.legend()
-    plt.savefig(img_name, transparent = False)
+    plt.savefig(img_name, transparent=False)
