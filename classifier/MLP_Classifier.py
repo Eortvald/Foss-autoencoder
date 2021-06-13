@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 from sklearn.metrics import accuracy_score
+import matplotlib.pylab as plt
 from torch import nn, optim
 from data.dataload_collection import *
 
@@ -107,31 +108,31 @@ def model_evaluate(testdataloader, model, ENC):
 
 if __name__ == "__main__":
 
-hidden_out = [8, 10, 8]
-ANN_10Kmodel = ANN(30, hidden_out)
-ANN_10Kmodel = ANN_10Kmodel.to(device)
-learningrate = 0.001  # Insert LR
-epochs = 50  # Insert epochs
+    hidden_out = [8, 10, 8]
+    ANN_10Kmodel = ANN(30, hidden_out)
+    ANN_10Kmodel = ANN_10Kmodel.to(device)
+    learningrate = 0.001  # Insert LR
+    epochs = 50  # Insert epochs
 
-train_log = []
-test_log = []
+    train_log = []
+    test_log = []
 
-for epoch in range(epochs):
-    print(f'\n\t\t------------------------------Epoch: {epoch + 1}------------------------------')
-    tr_loss = train_model(traindataloader, ANN_10Kmodel, ENCO)
-    train_log.append(tr_loss)
+    for epoch in range(epochs):
+        print(f'\n\t\t------------------------------Epoch: {epoch + 1}------------------------------')
+        tr_loss = train_model(traindataloader, ANN_10Kmodel, ENCO)
+        train_log.append(tr_loss)
 
-    print('\t\t\t>>>>>>>>>>>>>>>>TEST RESULTS<<<<<<<<<<<<<<<<<')
-    te_loss = model_evaluate(testdataloader, ANN_10Kmodel, ENCO)
-    test_log.append(te_loss)
+        print('\t\t\t>>>>>>>>>>>>>>>>TEST RESULTS<<<<<<<<<<<<<<<<<')
+        te_loss = model_evaluate(testdataloader, ANN_10Kmodel, ENCO)
+        test_log.append(te_loss)
 
-torch.save(ANN_10Kmodel.state_dict(), 'classifier/model_dicts/ANN_10Kmodel.pth')
+    torch.save(ANN_10Kmodel.state_dict(), 'classifier/model_dicts/ANN_10Kmodel.pth')
 
-img_name = f"plots/classifier-plots/ANN_10K_Results-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png"
-plt.plot(np.arange(len(train_log)), train_log, label='Train')  # etc.
-plt.plot(np.arange(len(test_log)), test_log, label='Test')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.title("Train vs Test loss")
-plt.legend()
-plt.savefig(img_name, transparent = False)
+    img_name = f"plots/classifier-plots/ANN_10K_Results-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png"
+    plt.plot(np.arange(len(train_log)), train_log, label='Train')  # etc.
+    plt.plot(np.arange(len(test_log)), test_log, label='Test')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.title("Train vs Test loss")
+    plt.legend()
+    plt.savefig(img_name, transparent = False)
