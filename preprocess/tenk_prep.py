@@ -3,13 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 #Choosing width and height cut-off
-max_w = 89
-max_h = 200
+max_w = 224
+max_h = 224
 n = 0
 i = 0
 #Path to root of images
 path = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/BlobArchive_v2/'
-savepath = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/'
+savepath = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/'
 
 #Labels
 df = pd.read_csv('Classifier_labels.csv')

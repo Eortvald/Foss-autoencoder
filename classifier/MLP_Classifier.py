@@ -21,18 +21,18 @@ class ANN(nn.Module):
 
         self.hidden1 = nn.Linear(n_inputs, hidden_out[0])
         self.af1 = nn.ReLU()
-        self.hidden2 = nn.Linear(hidden_out[0], hidden_out[1])
-        self.af2 = nn.ReLU()
-        self.hidden3 = nn.Linear(hidden_out[1], hidden_out[2])
-        self.af3 = nn.ReLU()
+#        self.hidden2 = nn.Linear(hidden_out[0], hidden_out[1])
+#        self.af2 = nn.ReLU()
+#        self.hidden3 = nn.Linear(hidden_out[1], hidden_out[2])
+#        self.af3 = nn.ReLU()
 
     def forward(self, X):
         X = self.hidden1(X)
         X = self.af1(X)
-        X = self.hidden2(X)
-        X = self.af2(X)
-        X = self.hidden3(X)
-        X = self.af3(X)
+#        X = self.hidden2(X)
+#        X = self.af2(X)
+#        X = self.hidden3(X)
+#        X = self.af3(X)
         return X
 
 
