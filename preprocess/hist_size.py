@@ -15,9 +15,13 @@ print(np.percentile(pic_width, np.linspace(90,99,10)), 'picke width')
 print(np.percentile(pic_height, np.linspace(90,99, 10)), 'pickle height')
 print(np.percentile(width, np.linspace(90,99,10)), 'width')
 print(np.percentile(height, np.linspace(90,99, 10)), 'height')
-'''
-plt.hist(width, bins = 200, alpha = 0.5, label = 'width')
+
+plt.hist(pic_height, bins = 200, alpha = 0.5, label = 'height')
+# plt.scatter(x = pic_height, y = pic_width, marker = '+', alpha = 0.002)
 plt.legend(loc = 'upper right')
-plt.savefig('width_distribution')
-plt.show()
-'''
+plt.savefig('C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester4/02466_Project/KORN/plots/preprocess-plots/pic_height')
+
+plt.hist(pic_width, bins = 200, alpha = 0.5, label = 'width')
+plt.legend(loc = 'upper right')
+plt.savefig('C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester4/02466_Project/KORN/plots/preprocess-plots/pic_width')
+

@@ -57,10 +57,11 @@ class Mask_n_pad(object):
         # Trim/Crop image
         img = np.delete(img, np.where(np.sum(mask, axis=1) == 0)[0], axis=0)
         h = np.shape(img[:, :, 7])[0]
-        img = np.delete(img, np.where(np.sum(mask, axis=0) == 0)[0], axis=1)
-        w = np.shape(img[:, :, 0])[1]
 
-        if (w > 80) or (h > 180):
+        img = np.delete(img, np.where(np.sum(mask, axis=0) == 0)[0], axis=1)
+        w = np.shape(img[:, :, 7])[1]
+
+        if (w > self.W) or (h > self.H):
             raise Exception('Image is too large. Larger than width:', self.W, 'or height', self.H)
 
         if (h % 2) == 0:
@@ -80,7 +81,7 @@ class Mask_n_pad(object):
         return np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
 
 
-T = transforms.Compose([Mask_n_pad(H=200, W=89),
+T = transforms.Compose([Mask_n_pad(H=180, W=80),
                         transforms.ToTensor(),
                         transforms.Normalize(mean=[1, 1, 1, 1, 1, 1, 1], std=[1, 1, 1, 1, 1, 1, 1])])
 
