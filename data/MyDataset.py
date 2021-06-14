@@ -84,6 +84,8 @@ T = transforms.Compose([Mask_n_pad(H=200, W=89),
                         transforms.ToTensor(),
                         transforms.Normalize(mean=[1, 1, 1, 1, 1, 1, 1], std=[1, 1, 1, 1, 1, 1, 1])])
 
+remove = Mask_n_pad(H=180,W=89)
+remove()
 
 class KornDataset(Dataset):
 
