@@ -80,6 +80,9 @@ def model_evaluate(testdataloader, model, ENC):
     correct = 0
     total = 0
 
+    confusion = np.zeros((7, 7))
+
+
     label_correct = {1.: 0,
                      2.: 0,
                      3.: 0,
@@ -114,11 +117,15 @@ def model_evaluate(testdataloader, model, ENC):
 
                 label_total[la] += 1
 
-                if la == pre:
+                if pre == la:
                     label_correct[pre] += 1
                     correct += 1
                 total += 1
 
+                if pre != la:
+                    confusion[int(la-1)][int(pre-1)] += 1
+
+        print(confusion)
         ACC = 100 * float(correct) / total
 
         c_acc = [label_correct[i] / label_total[i] * 100 for i in [1., 2., 3., 4., 5., 6., 7.]]
@@ -134,6 +141,7 @@ def model_evaluate(testdataloader, model, ENC):
         # Accuracy calculation and print
         test_loss /= dataset_size
         print(f'Avg. test loss {test_loss}  | Accuracy: {ACC} \n Class Accuracy {per_class}')
+        print(confusion)
 
     return test_loss
 
