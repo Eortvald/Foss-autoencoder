@@ -9,6 +9,10 @@ from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 from CAE_model import *
 from data.dataload_collection import *
+import torch, torchvision
+import matplotlib.pyplot as plt
+from datetime import *
+import autoencoder, classifier, preprocess
 
 X = torch.ones([1, 8,200,89]).to(device)
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -18,3 +22,5 @@ aemodel.eval()
 
 ENCO = lambda img : aemodel.encode(img)
 print(ENCO(X))
+
+
