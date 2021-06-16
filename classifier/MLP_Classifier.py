@@ -80,23 +80,21 @@ def model_evaluate(testdataloader, model, ENC):
     correct = 0
     total = 0
 
-    label_correct = {1: 0,
-                     2: 0,
-                     3: 0,
-                     4: 0,
-                     5: 0,
-                     6: 0,
-                     7: 0,
-                     8: 0}
+    label_correct = {1.: 0,
+                     2.: 0,
+                     3.: 0,
+                     4.: 0,
+                     5.: 0,
+                     6.: 0,
+                     7.: 0}
 
-    label_total = {1: 0,
-                     2: 0,
-                     3: 0,
-                     4: 0,
-                     5: 0,
-                     6: 0,
-                     7: 0,
-                     8: 0}
+    label_total = {1.: 0,
+                   2.: 0,
+                   3.: 0,
+                   4.: 0,
+                   5.: 0,
+                   6.: 0,
+                   7.: 0}
 
     with torch.no_grad():
         for i, (inputs, label) in enumerate(testdataloader):
@@ -114,18 +112,28 @@ def model_evaluate(testdataloader, model, ENC):
 
             for la, pre in zip(label.detach().cpu().numpy(), yhat.detach().cpu().numpy()):
 
-                label_total[int(la)] += 1
+                label_total[la] += 1
 
                 if la == pre:
-                    label_correct[int(pre)] += 1
+                    label_correct[pre] += 1
                     correct += 1
                 total += 1
 
         ACC = 100 * float(correct) / total
 
+        c_acc = [label_correct[i] / label_total[i] * 100 for i in [1., 2., 3., 4., 5., 6., 7.]]
+
+        per_class = {'Oat': c_acc[1],
+                        'Broken': c_acc[2],
+                        'Rye': c_acc[3],
+                        'Wheat': c_acc[4],
+                        'BarleyGreen': c_acc[5],
+                        'Cleaved': c_acc[6],
+                        'Skinned': c_acc[7]}
+
         # Accuracy calculation and print
         test_loss /= dataset_size
-        print(f'Avg. test loss {test_loss}  | Accuray: {ACC}')
+        print(f'Avg. test loss {test_loss}  | Accuracy: {ACC} \n Class Accuracy {per_class}')
 
     return test_loss
 
@@ -140,7 +148,8 @@ if __name__ == "__main__":
 
     ENCO = lambda img: aemodel.encode(img)
 
-    hidden_out = [8, 10, 8]
+    classes = ['Oat', 'Broken', 'Rye', 'Wheat', 'BarleyGreen', 'Cleaved', 'Skinned']
+    hidden_out = [18]
     ANN_10Kmodel = ANN(30, hidden_out)
     ANN_10Kmodel = ANN_10Kmodel.to(device)
     learningrate = 0.001  # Insert LR

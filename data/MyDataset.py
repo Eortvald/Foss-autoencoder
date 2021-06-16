@@ -82,7 +82,7 @@ class Mask_n_pad(object):
             return np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
 
 
-T = transforms.Compose([Mask_n_pad(H=200, W=89),
+T = transforms.Compose([Mask_n_pad(H=180, W=80),
                         transforms.ToTensor(),
                         transforms.Normalize(mean=[1., 1., 1., 1., 1., 1., 1., 1.], std=[1., 1., 1., 1., 1., 1., 1., 1.])])
 
@@ -98,14 +98,15 @@ class KornDataset(Dataset):
     def __getitem__(self, index):
         img = np.load(self.data_files[index]).astype(float)
 
-        if label_path is not None:
-            label = self.labels.loc[os.path.basename(os.path.normpath(self.data_files[index])).split(".")[0]]
-
-
         if self.transform:
             img = self.transform(img)
 
-        return img, label
+
+        if label_path is not None:
+            label = self.labels.loc[os.path.basename(os.path.normpath(self.data_files[index])).split(".")[0]]
+            return img, label
+
+        return img
 
     def __len__(self):
         return len(self.data_files)
@@ -129,3 +130,25 @@ ar[1].imshow(np.dstack((post[:,:,4], post[:,:,2], post[:,:,1])))
 fig.show()
 print(np.shape(img), np.shape(post))
 '''
+if __name__ == "__main__":
+
+    path = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
+
+    S = transforms.Compose([Mask_n_pad(H=180, W=80),transforms.ToTensor()])
+    Dataset = KornDataset(data_path=path, transform=S)
+    loader = DataLoader(Dataset, num_workers=2)
+
+    for i, (inputs, label) in enumerate(loader):
+
+
+
+    mean = torch.mean(tx, dim=(0, 2, 3))
+    std = torch.std(tx, dim=(0, 2, 3))
+
+    np.save('10K_mean', mean)
+    np.save('10K_std', std)
+
+    print(mean)
+    print(std)
+
+stat_npy_dir(PATH, 'train/')
