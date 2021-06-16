@@ -97,7 +97,7 @@ def model_evaluate(testdataloader, model, ENC):
                    7.: 0}
 
     with torch.no_grad():
-        for i, (inputs, label) in enumerate(testdataloader):
+        for i, (img, label) in enumerate(testdataloader):
             # Evaluating model on test set
             # ENCODER HERE
             label = label.to(device)

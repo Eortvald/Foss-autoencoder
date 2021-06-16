@@ -106,7 +106,7 @@ class KornDataset(Dataset):
             label = self.labels.loc[os.path.basename(os.path.normpath(self.data_files[index])).split(".")[0]]
             return img, label
 
-        return img
+        return img, '_'
 
     def __len__(self):
         return len(self.data_files)
@@ -136,14 +136,18 @@ if __name__ == "__main__":
 
     S = transforms.Compose([Mask_n_pad(H=180, W=80),transforms.ToTensor()])
     Dataset = KornDataset(data_path=path, transform=S)
-    loader = DataLoader(Dataset, num_workers=2)
-
-    for i, (inputs, label) in enumerate(loader):
+    loader = DataLoader(Dataset, batch_size=1000, num_workers=8)
 
 
+    for inputs, label in loader:
 
-    mean = torch.mean(tx, dim=(0, 2, 3))
-    std = torch.std(tx, dim=(0, 2, 3))
+        temp_mean = torch.mean(inputs, dim=(0, 2, 3))
+        temp_std = torch.std(inputs, dim=(0, 2, 3))
+
+
+
+    mean = torch.mean(means, dim=(0, 2, 3))
+    std = torch.std(stds, dim=(0, 2, 3))
 
     np.save('10K_mean', mean)
     np.save('10K_std', std)
