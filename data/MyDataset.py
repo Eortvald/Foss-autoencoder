@@ -130,29 +130,3 @@ ar[1].imshow(np.dstack((post[:,:,4], post[:,:,2], post[:,:,1])))
 fig.show()
 print(np.shape(img), np.shape(post))
 '''
-if __name__ == "__main__":
-
-    path = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
-
-    S = transforms.Compose([Mask_n_pad(H=180, W=80),transforms.ToTensor()])
-    Dataset = KornDataset(data_path=path, transform=S)
-    loader = DataLoader(Dataset, batch_size=1000, num_workers=8)
-
-
-    for inputs, label in loader:
-
-        temp_mean = torch.mean(inputs, dim=(0, 2, 3))
-        temp_std = torch.std(inputs, dim=(0, 2, 3))
-
-
-
-    mean = torch.mean(means, dim=(0, 2, 3))
-    std = torch.std(stds, dim=(0, 2, 3))
-
-    np.save('10K_mean', mean)
-    np.save('10K_std', std)
-
-    print(mean)
-    print(std)
-
-stat_npy_dir(PATH, 'train/')
