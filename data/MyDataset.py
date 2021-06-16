@@ -29,7 +29,7 @@ def _make_data_list(root_path: str):
     for folder in folders:
         with os.scandir(root_path + folder) as entries:
             for entry in entries:
-                data_list.append(root_path + folder + entry.name.split(".")[0] + '.npy')
+                data_list.append(root_path + folder + '/' + entry.name.split(".")[0] + '.npy')
     return data_list
 
 
@@ -53,7 +53,7 @@ class Mask_n_pad(object):
 
         # Apply mask
         mask = img[:, :, 7]
-        img = np.where(mask[..., None] != 0, img, [0, 0, 0, 0, 0, 0, 0, 0])
+        img = np.where(mask[..., None] != 0, img, [0., 0., 0., 0., 0., 0., 0., 0.])
 
         # Trim/Crop image
         img = np.delete(img, np.where(np.sum(mask, axis=1) == 0)[0], axis=0)
@@ -62,44 +62,45 @@ class Mask_n_pad(object):
         w = np.shape(img[:, :, 0])[1]
 
         if (w > 80) or (h > 180):
-            raise Exception('Image is too large. Larger than width:', self.W, 'or height', self.H)
+            print('Image is too large. Larger than width:', self.W, 'or height', self.H)
+            np.delete(img)
+        else:
+            if (h % 2) == 0:
+                rh1 = (self.H - h) / 2
+                rh2 = (self.H - h) / 2
+            elif (h % 2) == 1:
+                rh1 = (self.H - h + 1) / 2
+                rh2 = (self.H - h - 1) / 2
+            if (w % 2) == 0:
+                rw1 = (self.W - w) / 2
+                rw2 = (self.W - w) / 2
+            elif (w % 2) == 1:
+                rw1 = (self.W - w + 1) / 2
+                rw2 = (self.W - w - 1) / 2
 
-        if (h % 2) == 0:
-            rh1 = (self.H - h) / 2
-            rh2 = (self.H - h) / 2
-        elif (h % 2) == 1:
-            rh1 = (self.H - h + 1) / 2
-            rh2 = (self.H - h - 1) / 2
-        if (w % 2) == 0:
-            rw1 = (self.W - w) / 2
-            rw2 = (self.W - w) / 2
-        elif (w % 2) == 1:
-            rw1 = (self.W - w + 1) / 2
-            rw2 = (self.W - w - 1) / 2
-
-        # Zero padding
-        return np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
+            # Zero padding
+            return np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
 
 
 T = transforms.Compose([Mask_n_pad(H=200, W=89),
                         transforms.ToTensor(),
-                        transforms.Normalize(mean=[1, 1, 1, 1, 1, 1, 1], std=[1, 1, 1, 1, 1, 1, 1])])
+                        transforms.Normalize(mean=[1., 1., 1., 1., 1., 1., 1., 1.], std=[1., 1., 1., 1., 1., 1., 1., 1.])])
 
 
 class KornDataset(Dataset):
 
     def __init__(self, data_path, label_path=None, transform=None):
         self.data_files = _make_data_list(data_path)
-        self.labels = pd.read_csv(label_path)
+        if label_path is not None:
+            self.labels = pd.read_csv(label_path).set_index(['Names'])
         self.transform = transform
 
     def __getitem__(self, index):
-        img = np.load(self.data_files[index])
+        img = np.load(self.data_files[index]).astype(float)
 
-        label = None
+        if label_path is not None:
+            label = self.labels.loc[os.path.basename(os.path.normpath(self.data_files[index])).split(".")[0]]
 
-        if self.labels:
-            label = self.labels.iloc[index, 1]  # retrive the label coresponding to the image
 
         if self.transform:
             img = self.transform(img)
@@ -109,10 +110,13 @@ class KornDataset(Dataset):
     def __len__(self):
         return len(self.data_files)
 
-
-Dataset = KornDataset(data_path='...', label_path='...',
+path = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
+label_path = 'C:/Users/Ext1306/PycharmProjects/Foss-autoencoder/preprocess/labels.csv'
+Dataset = KornDataset(data_path=path, label_path=label_path,
                       transform=T)  # the dataset object can be indexed like a regular list
-loader = DataLoader(Dataset, num_workers=8)
+img0, label0 = Dataset[0]
+print(img0)
+loader = DataLoader(Dataset, num_workers=2)
 
 '''
 # Test of classes
