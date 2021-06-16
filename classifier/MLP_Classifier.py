@@ -72,7 +72,7 @@ def train_model(traindataloader, model, ENC):
 # test model
 
 def model_evaluate(testdataloader, model, ENC):
-    dataset_size = len(traindataloader.dataset)
+    dataset_size = len(testdataloader.dataset)
     test_loss = 0
     criterion = nn.CrossEntropyLoss()
     correct = 0
@@ -97,11 +97,11 @@ def model_evaluate(testdataloader, model, ENC):
                     correct += 1
                 total += 1
 
-    ACC = 100 * float(correct) / total
+        ACC = 100 * float(correct) / total
 
     # Accuracy calculation and print
-    test_loss /= dataset_size
-    print(f'Avg. test loss {test_loss}  | Accuray: {ACC}')
+        test_loss /= dataset_size
+        print(f'Avg. test loss {test_loss}  | Accuray: {ACC}')
 
     return test_loss
 
