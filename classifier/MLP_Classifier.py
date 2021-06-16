@@ -4,6 +4,7 @@ from sklearn.metrics import accuracy_score
 import matplotlib.pylab as plt
 from torch import nn, optim
 from data.dataload_collection import *
+from autoencoder.CAE_model import *
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Using {device} device')
@@ -21,18 +22,19 @@ class ANN(nn.Module):
 
         self.hidden1 = nn.Linear(n_inputs, hidden_out[0])
         self.af1 = nn.ReLU()
-#        self.hidden2 = nn.Linear(hidden_out[0], hidden_out[1])
-#        self.af2 = nn.ReLU()
-#        self.hidden3 = nn.Linear(hidden_out[1], hidden_out[2])
-#        self.af3 = nn.ReLU()
+
+    #        self.hidden2 = nn.Linear(hidden_out[0], hidden_out[1])
+    #        self.af2 = nn.ReLU()
+    #        self.hidden3 = nn.Linear(hidden_out[1], hidden_out[2])
+    #        self.af3 = nn.ReLU()
 
     def forward(self, X):
         X = self.hidden1(X)
         X = self.af1(X)
-#        X = self.hidden2(X)
-#        X = self.af2(X)
-#        X = self.hidden3(X)
-#        X = self.af3(X)
+        #        X = self.hidden2(X)
+        #        X = self.af2(X)
+        #        X = self.hidden3(X)
+        #        X = self.af3(X)
         return X
 
 
@@ -77,6 +79,25 @@ def model_evaluate(testdataloader, model, ENC):
     criterion = nn.CrossEntropyLoss()
     correct = 0
     total = 0
+
+    label_correct = {1: 0,
+                     2: 0,
+                     3: 0,
+                     4: 0,
+                     5: 0,
+                     6: 0,
+                     7: 0,
+                     8: 0}
+
+    label_total = {1: 0,
+                     2: 0,
+                     3: 0,
+                     4: 0,
+                     5: 0,
+                     6: 0,
+                     7: 0,
+                     8: 0}
+
     with torch.no_grad():
         for i, (inputs, label) in enumerate(testdataloader):
             # Evaluating model on test set
@@ -93,13 +114,16 @@ def model_evaluate(testdataloader, model, ENC):
 
             for la, pre in zip(label.detach().cpu().numpy(), yhat.detach().cpu().numpy()):
 
+                label_total[int(la)] += 1
+
                 if la == pre:
+                    label_correct[int(pre)] += 1
                     correct += 1
                 total += 1
 
         ACC = 100 * float(correct) / total
 
-    # Accuracy calculation and print
+        # Accuracy calculation and print
         test_loss /= dataset_size
         print(f'Avg. test loss {test_loss}  | Accuray: {ACC}')
 
@@ -115,7 +139,6 @@ if __name__ == "__main__":
     aemodel.eval()
 
     ENCO = lambda img: aemodel.encode(img)
-
 
     hidden_out = [8, 10, 8]
     ANN_10Kmodel = ANN(30, hidden_out)
