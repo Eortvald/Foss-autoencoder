@@ -7,6 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 import torchvision
+from torchsummary import summary
 from torchvision import models
 import matplotlib.pyplot as plt
 import time
@@ -20,7 +21,7 @@ num_classes = 7
 batch_size = 8
 
 # Number of epochs to train for
-num_epochs = 15
+num_epochs = 3
 
 # Flag for feature extracting. When False, we finetune the whole model,
 #   when True we only update the reshaped layer params
@@ -39,13 +40,7 @@ def buildResNet50Model(numClasses):
 
     # the last (fully connected) layer per the number of classes
     # first, get/save the current number of input features to the fc layer
-    numFcInputs = model.fc.in_features
-    # now replace the fc layer with minor changes, and using our number of classes
-    model.fc = nn.Sequential(nn.Linear(numFcInputs, 256),
-                             nn.ReLU(),
-                             nn.Dropout(0.2),
-                             nn.Linear(256, numClasses))
-
+    print(model.fc.in_features)
     return model
 # end function
 def train_model(model, dataloaders, criterion, optimizer, num_epochs):
@@ -94,10 +89,13 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs):
 
                 # statistics
                 running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
+                if preds == labels.data:
+                    print("yes")
+                    running_corrects +=1
+                #running_corrects += torch.sum(preds == labels.data)
 
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
-            epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
+            epoch_acc = running_corrects / len(dataloaders[phase].dataset)
 
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
@@ -105,8 +103,10 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs):
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
+                best_loss = epoch_loss
             if phase == 'val':
                 val_acc_history.append(epoch_acc)
+                #val_loss_history.append(epoch_loss)
 
         print()
 
@@ -118,18 +118,20 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs):
     model.load_state_dict(best_model_wts)
     return model, val_acc_history
 
-def initialize_model(model_name, num_classes, feature_extract, use_pretrained=True):
-    # Initialize these variables which will be set in this if statement.
+def initialize_model(num_classes):
+    # Initialize these variables
     model_ft = None
     input_size = 0
+    model_ft = buildResNet50Model(num_classes)
+    #set_parameter_requires_grad(model_ft, feature_extract)
+    num_ftrs = model_ft.fc.in_features#[0]#.in_features
+    model_ft.fc = nn.Linear(num_ftrs, num_classes)
+    input_size = 224
+    return model_ft, input_size
 
-    if model_name == "resnet":
-        model_ft = buildResNet50Model(num_classes)
-        set_parameter_requires_grad(model_ft, feature_extract)
-        num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(num_ftrs, num_classes)
-        input_size = 180
-
+#initialize model
+model_ft, input_size = initialize_model(num_classes)
+print(summary(model_ft,(8,224,224)))
 print("Initializing Datasets and Dataloaders...")
 dataloaders_dict = {'train': Ktrain_loader,
                     'val': Ktest_loader
