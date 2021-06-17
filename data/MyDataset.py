@@ -64,7 +64,7 @@ class Mask_n_pad(object):
 
         if (w > 80) or (h > 180):
             print('Image is too large. Larger than width:', self.W, 'or height', self.H)
-            # np.delete(img)
+            #np.delete(img)
         else:
             if (h % 2) == 0:
                 rh1 = (self.H - h) / 2
@@ -96,16 +96,17 @@ class KornDataset(Dataset):
         self.data_files = _make_data_list(data_path)
         self.transform = transform
         self.get_label = False
-
         if self.label_path is not None:
             self.labels = pd.read_csv(label_path).set_index(['Names'])
             self.get_label = True
 
     def __getitem__(self, index):
         img = np.load(self.data_files[index]).astype(float)
-
         if self.transform:
+            print(self.data_files[index])
+            print(img)
             img = self.transform(img)
+            print(f'succeded{index}')
 
         if self.get_label:
             im = os.path.basename(os.path.normpath(self.data_files[index])).split(".")[0]

@@ -41,7 +41,7 @@ def pickle_to_ndarray(path, save_path, n_files = 120000):
             k_len = (int(float(image['attributes']['Length'])))
             k_wid = (int(float(image['attributes']['Width'])))
 
-            if (k_len <= 190) and (k_wid <= 80):
+            if (k_len <= 180) and (k_wid <= 80):
                 img = image['image']
 
 
