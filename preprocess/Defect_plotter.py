@@ -21,7 +21,8 @@ def defect_plotter(root_path, labels_path):
         img = np.load(root_path + choice['folder'] + '/' + choice['Names'] + '.npy')
         ar[i].imshow(np.dstack((img[:,:,4], img[:,:,2], img[:,:,1])))
         ar[i].set_title(defects)
-        ar[i].set_xlim(0, 70)
+        ar[i].set_xlim(0,np.shape(img)[1])
+        ar[i].set_ylim(0,np.shape(img)[0])
         if defects == 'BarleyGreen':
             ar[i].set_title('Green')
     plt.savefig('defects')
