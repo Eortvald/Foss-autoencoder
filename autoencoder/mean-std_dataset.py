@@ -7,8 +7,14 @@ from torch.utils.data import DataLoader, TensorDataset
 from os import listdir
 from data.MyDataset import *
 
+PATH_dict = {
+    '10K': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
+    'gamer': 'C:/Data/DeepEye/Foss_student/tenkblobs/',
+    '224' : 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/',
+    'validation' : 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_grain/'
+}
 
-path = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
+path = PATH_dict['10K']
 
 S = transforms.Compose([Mask_n_pad(H=180, W=80),transforms.ToTensor()])
 Dataset = KornDataset(data_path=path, transform=S)
