@@ -23,18 +23,21 @@ s = np.load('../10K_std.npy')
 print(f'mean: {m}\n std:{s}')
 
 
-S = transforms.Compose([Mask_n_pad(H=180, W=80),transforms.ToTensor()])
+S = transforms.Compose([Mask_n_pad(H=180, W=80)])
 Dataset = KornDataset(data_path=path, transform=S, label_path=None)
+
+print(Dataset[8][0])
 
 STATloader = DataLoader(Dataset, batch_size=1000, num_workers=0)
 
-
+Tens = transforms.ToTensor()
 
 means = []
 stds = []
+
+
 for inputs, label in STATloader:
-    print(inputs[0].size())
-    print(inputs)
+    #print(inputs[0][0][80:90])
     temp_mean = torch.mean(inputs, dim=(0, 2, 3))
     print(temp_mean)
     temp_std = torch.std(inputs, dim=(0, 2, 3))
