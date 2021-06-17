@@ -13,7 +13,8 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 PATH_dict = {
     '10K': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
     'gamer': 'C:/Data/DeepEye/Foss_student/tenkblobs/',
-    '224' : 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/'
+    '224' : 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/',
+    'validation' : 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_grain/'
 }
 
 ### If training on Foss Laptop select '10K'
