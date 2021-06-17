@@ -15,7 +15,7 @@ PATH_dict = {
     'mix' : 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/grainmix'
 }
 
-path = PATH_dict['mix']
+path = PATH_dict['validation']
 
 m = np.load('../10K_mean.npy')
 s = np.load('../10K_std.npy')
@@ -24,7 +24,7 @@ print(f'mean: {m}\n std:{s}')
 
 
 S = transforms.Compose([Mask_n_pad(H=180, W=80),transforms.ToTensor()])
-Dataset = KornDataset(data_path=path+'/train/', transform=S, label_path=None)
+Dataset = KornDataset(data_path=path, transform=S, label_path=None)
 
 STATloader = DataLoader(Dataset, batch_size=1000, num_workers=0)
 
@@ -36,6 +36,7 @@ for inputs, label in STATloader:
     print(inputs[0].size())
     print(inputs)
     temp_mean = torch.mean(inputs, dim=(0, 2, 3))
+    print(temp_mean)
     temp_std = torch.std(inputs, dim=(0, 2, 3))
 
     means.append(temp_mean)

@@ -39,8 +39,8 @@ def pickle_to_ndarray(path, save_path, n_files=120000):
             if n == n_files:
                 break
 
-            k_len = np.array(image['Image']).shape[0]
-            k_wid = np.array(image['Image']).shape[1]
+            k_len = np.array(image['image']).shape[0]
+            k_wid = np.array(image['image']).shape[1]
 
             print(k_len,k_wid)
 

@@ -63,6 +63,7 @@ class Mask_n_pad(object):
         w = np.shape(img[:, :, 0])[1]
 
         if (w > 80) or (h > 180):
+
             plt.imshow(img[:,:,4], img[:,:,2], img[:,:,1])
             plt.show()
             raise Exception('Image is too large. Larger than width:', self.W, 'or height', self.H)
@@ -104,10 +105,8 @@ class KornDataset(Dataset):
     def __getitem__(self, index):
         img = np.load(self.data_files[index]).astype(float)
         if self.transform:
-            print(self.data_files[index])
-            print(img)
             img = self.transform(img)
-            print(f'succeded{index}')
+
 
         if self.get_label:
             im = os.path.basename(os.path.normpath(self.data_files[index])).split(".")[0]
