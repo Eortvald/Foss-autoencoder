@@ -34,12 +34,21 @@ matrix = np.array([row for i in range(100)])
 
 print(matrix.mean(0))
 
+feature_class_vectors = {'Oat':1,
+                         'Broken':2,
+                         'Rye':3,
+                         'Wheat':4,
+                         'BarleyGreen':5,
+                         'Cleaved':6,
+                         'Skinned':7,
+                         'Barley*':8}
+
 
 sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
 
 # Create the data
 
-g = np.tile(list("ABCDEFGHIJ"), 5)
+g = np.tile(['Oat', 'Broken', 'Rye', 'Wheat', 'BarleyGreen', 'Cleaved', 'Skinned', 'Barley*'], 8)
 df = pd.DataFrame(dict(x=x, g=g))
 
 # Initialize the FacetGrid object
