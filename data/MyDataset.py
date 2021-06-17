@@ -103,7 +103,8 @@ class KornDataset(Dataset):
 
 
         if label_path is not None:
-            label = self.labels.loc[os.path.basename(os.path.normpath(self.data_files[index])).split(".")[0]]
+            im = os.path.basename(os.path.normpath(self.data_files[index])).split(".")[0]
+            label = str(self.labels.loc[im][0:7][self.labels.loc[im][0:7] == True]).split(' ')[0]
             return img, label
 
         return img, '_'
@@ -111,12 +112,12 @@ class KornDataset(Dataset):
     def __len__(self):
         return len(self.data_files)
 
-path = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
-label_path = 'C:/Users/Ext1306/PycharmProjects/Foss-autoencoder/preprocess/labels.csv'
+path = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_blob/'
+label_path = 'C:/Users/Ext1306/PycharmProjects/Foss-autoencoder/preprocess/Classifier_labels.csv'
 Dataset = KornDataset(data_path=path, label_path=label_path,
                       transform=T)  # the dataset object can be indexed like a regular list
 img0, label0 = Dataset[0]
-print(img0)
+print(label0)
 loader = DataLoader(Dataset, num_workers=2)
 
 '''
