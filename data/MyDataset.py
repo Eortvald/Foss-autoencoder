@@ -5,12 +5,13 @@ from torch import nn
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Dataset
 import os
-#from dataload_collection import PATH_dict
+# from dataload_collection import PATH_dict
 import pickle
 import matplotlib.pyplot as plt
 
+
 # PATH = PATH_dict['']    # add 2017 to mother dict first
-#PATH = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
+# PATH = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
 
 
 def _load_pickle_file(path):
@@ -63,7 +64,7 @@ class Mask_n_pad(object):
 
         if (w > 80) or (h > 180):
             print('Image is too large. Larger than width:', self.W, 'or height', self.H)
-            np.delete(img)
+            # np.delete(img)
         else:
             if (h % 2) == 0:
                 rh1 = (self.H - h) / 2
@@ -84,16 +85,21 @@ class Mask_n_pad(object):
 
 T = transforms.Compose([Mask_n_pad(H=180, W=80),
                         transforms.ToTensor(),
-                        transforms.Normalize(mean=[1., 1., 1., 1., 1., 1., 1., 1.], std=[1., 1., 1., 1., 1., 1., 1., 1.])])
+                        transforms.Normalize(mean=[1., 1., 1., 1., 1., 1., 1., 1.],
+                                             std=[1., 1., 1., 1., 1., 1., 1., 1.])])
 
 
 class KornDataset(Dataset):
 
     def __init__(self, data_path, label_path=None, transform=None):
+        self.label_path = label_path
         self.data_files = _make_data_list(data_path)
-        if label_path is not None:
-            self.labels = pd.read_csv(label_path).set_index(['Names'])
         self.transform = transform
+        self.get_label = False
+
+        if self.label_path is not None:
+            self.labels = pd.read_csv(label_path).set_index(['Names'])
+            self.get_label = True
 
     def __getitem__(self, index):
         img = np.load(self.data_files[index]).astype(float)
@@ -101,8 +107,7 @@ class KornDataset(Dataset):
         if self.transform:
             img = self.transform(img)
 
-
-        if label_path is not None:
+        if self.get_label:
             im = os.path.basename(os.path.normpath(self.data_files[index])).split(".")[0]
             label = str(self.labels.loc[im][0:7][self.labels.loc[im][0:7] == True]).split(' ')[0]
             return img, label
@@ -114,7 +119,6 @@ class KornDataset(Dataset):
 
 
 if __name__ == '__main__':
-
     path = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_blob/'
     label_path = 'C:/Users/Ext1306/PycharmProjects/Foss-autoencoder/preprocess/Classifier_labels.csv'
     Dataset = KornDataset(data_path=path, label_path=label_path,

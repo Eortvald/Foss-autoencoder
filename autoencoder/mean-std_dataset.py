@@ -11,10 +11,11 @@ PATH_dict = {
     '10K': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
     'gamer': 'C:/Data/DeepEye/Foss_student/tenkblobs/',
     '224' : 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/',
-    'validation' : 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_grain/'
+    'validation' : 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_grain/',
+    'mix' : 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/grainmix'
 }
 
-path = PATH_dict['10K']
+path = PATH_dict['mix']
 
 m = np.load('../10K_mean.npy')
 s = np.load('../10K_std.npy')
@@ -23,13 +24,13 @@ print(f'mean: {m}\n std:{s}')
 
 
 S = transforms.Compose([Mask_n_pad(H=180, W=80),transforms.ToTensor()])
-Dataset = KornDataset(data_path=path, transform=S)
+Dataset = KornDataset(data_path=path+'/train/', transform=S, label_path=None)
 STATloader = DataLoader(Dataset, batch_size=1000, num_workers=0)
 
 means = []
 stds = []
 for inputs, label in STATloader:
-
+    print(inputs[0].size())
     temp_mean = torch.mean(inputs, dim=(0, 2, 3))
     temp_std = torch.std(inputs, dim=(0, 2, 3))
 
