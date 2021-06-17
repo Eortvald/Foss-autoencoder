@@ -63,8 +63,9 @@ class Mask_n_pad(object):
         w = np.shape(img[:, :, 0])[1]
 
         if (w > 80) or (h > 180):
-            print('Image is too large. Larger than width:', self.W, 'or height', self.H)
-            #np.delete(img)
+            plt.imshow(img[:,:,4], img[:,:,2], img[:,:,1])
+            plt.show()
+            raise Exception('Image is too large. Larger than width:', self.W, 'or height', self.H)
         else:
             if (h % 2) == 0:
                 rh1 = (self.H - h) / 2
