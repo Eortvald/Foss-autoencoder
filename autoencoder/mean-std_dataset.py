@@ -16,9 +16,15 @@ PATH_dict = {
 
 path = PATH_dict['10K']
 
+m = np.load('../10K_mean.npy')
+s = np.load('../10K_std.npy')
+
+print(f'mean: {m}\n std:{s}')
+
+
 S = transforms.Compose([Mask_n_pad(H=180, W=80),transforms.ToTensor()])
 Dataset = KornDataset(data_path=path, transform=S)
-STATloader = DataLoader(Dataset, batch_size=1000, num_workers=8)
+STATloader = DataLoader(Dataset, batch_size=1000, num_workers=0)
 
 means = []
 stds = []
