@@ -112,13 +112,16 @@ class KornDataset(Dataset):
     def __len__(self):
         return len(self.data_files)
 
-path = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_blob/'
-label_path = 'C:/Users/Ext1306/PycharmProjects/Foss-autoencoder/preprocess/Classifier_labels.csv'
-Dataset = KornDataset(data_path=path, label_path=label_path,
-                      transform=T)  # the dataset object can be indexed like a regular list
-img0, label0 = Dataset[0]
-print(label0)
-loader = DataLoader(Dataset, num_workers=2)
+
+if __name__ == '__main__':
+
+    path = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_blob/'
+    label_path = 'C:/Users/Ext1306/PycharmProjects/Foss-autoencoder/preprocess/Classifier_labels.csv'
+    Dataset = KornDataset(data_path=path, label_path=label_path,
+                          transform=T)  # the dataset object can be indexed like a regular list
+    img0, label0 = Dataset[0]
+    print(label0)
+    loader = DataLoader(Dataset, num_workers=2)
 
 '''
 # Test of classes
