@@ -3,16 +3,17 @@ import pickle
 import os
 import datetime
 
-def pickle_to_ndarray(path, save_path, n_files = 120000):
-    #Make counter
+
+def pickle_to_ndarray(path, save_path, n_files=120000):
+    # Make counter
     n = 0
 
-    #List pickles in 2018/2017 samples
+    # List pickles in 2018/2017 samples
     pickles = os.listdir(path)
     p_len = len(pickles)
 
-    #Create sub-folders so theres 10k in each.
-    for i in range(n_files//10000):
+    # Create sub-folders so theres 10k in each.
+    for i in range(n_files // 10000):
         sub = os.path.join(save_path + 'a' + str(i))
         try:
             os.makedirs(sub)
@@ -22,7 +23,7 @@ def pickle_to_ndarray(path, save_path, n_files = 120000):
     folders = os.listdir(save_path)
     folder_idx = -1
 
-    #Loop that continues until n_files (def = 120.000) is added
+    # Loop that continues until n_files (def = 120.000) is added
     for i, file in enumerate(pickles):
         if n == n_files:
             break
@@ -38,14 +39,15 @@ def pickle_to_ndarray(path, save_path, n_files = 120000):
             if n == n_files:
                 break
 
-            k_len = (int(float(image['attributes']['Length'])))
-            k_wid = (int(float(image['attributes']['Width'])))
+            k_len = np.array(image['Image']).shape[0]
+            k_wid = np.array(image['Image']).shape[1]
+
+            print(k_len,k_wid)
 
             if (k_len <= 180) and (k_wid <= 80):
                 img = image['image']
 
-
-                #Saving the image
+                # Saving the image
                 if n % 10000 == 0:
                     folder_idx += 1
                     if folder_idx != 0:
@@ -53,7 +55,6 @@ def pickle_to_ndarray(path, save_path, n_files = 120000):
 
                 n += 1
                 np.save(save_path + folders[folder_idx] + '/grain' + str(n), img)
-
 
 
 path = "M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/validation/Images/2018 samples/"
