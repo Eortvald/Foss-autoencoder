@@ -82,7 +82,7 @@ class Mask_n_pad(object):
             return np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
 
 
-T = transforms.Compose([Mask_n_pad(H=200, W=89),
+T = transforms.Compose([Mask_n_pad(H=180, W=80),
                         transforms.ToTensor(),
                         transforms.Normalize(mean=[1., 1., 1., 1., 1., 1., 1., 1.], std=[1., 1., 1., 1., 1., 1., 1., 1.])])
 
@@ -98,14 +98,15 @@ class KornDataset(Dataset):
     def __getitem__(self, index):
         img = np.load(self.data_files[index]).astype(float)
 
-        if label_path is not None:
-            label = self.labels.loc[os.path.basename(os.path.normpath(self.data_files[index])).split(".")[0]]
-
-
         if self.transform:
             img = self.transform(img)
 
-        return img, label
+
+        if label_path is not None:
+            label = self.labels.loc[os.path.basename(os.path.normpath(self.data_files[index])).split(".")[0]]
+            return img, label
+
+        return img, '_'
 
     def __len__(self):
         return len(self.data_files)
