@@ -9,7 +9,7 @@ from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 from CAE_model import *
 from data.dataload_collection import *
-
+from data.MyDataset import *
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Using {device} device')
 
@@ -57,14 +57,18 @@ def test_AE(model, test_loader):
     test_loss /= len(test_loader.dataset)
     print(f'\t \t \t Test Error: Avg loss: {test_loss} \n')
 
-    if epoch == 100:
-        pic = to_img(X_hat.cpu().X)
-        save_image(pic, './img/image_{}.png'.format(epoch))
+    #if epoch == 100:
+    #    pic = to_img(X_hat.cpu().X)
+    #    save_image(pic, '../plots/autoencoder-plots/images/image_{}.png'.format(epoch))
 
     return test_loss
 
 
 if __name__ == "__main__":
+
+    #label_path = '../preprocess/Classifier_labels.csv'
+    #Dataset = KornDataset(data_path=path, transform=T)  # the dataset object can be indexed like a regular list
+    #loader = DataLoader(Dataset, num_workers=2)
 
     # b_size =
     num_epochs = 100
@@ -81,6 +85,8 @@ if __name__ == "__main__":
 
     train_log = []
     test_log = []
+
+
 
     for epoch in range(num_epochs):
         print(f'\n\t\t------------------------------Epoch: {epoch + 1}------------------------------')

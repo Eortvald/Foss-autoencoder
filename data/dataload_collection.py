@@ -22,9 +22,9 @@ PATH_dict = {
 PATH = PATH_dict['gamer']
 
 # Transforms
-MEAN_8ch = np.load('10K_mean.npy')
-STD_8ch = np.load('10K_std.npy')
-
+MEAN_8ch = np.load('../MEAN.npy')
+STD_8ch = np.load('../STD.npy')
+print(MEAN_8ch)
 T = transforms.Normalize(mean=MEAN_8ch, std=STD_8ch)
 
 
@@ -50,10 +50,10 @@ def npy_dir(path: str, subset: str):
 
     folder = listdir(path)
     folder_images = len(folder)
-    for i, NPY in enumerate(folder):
+    for i, NPY in tqdm(enumerate(folder)):
 
-        if i % 200 == 0:
-            print(f'Images loaded: [{i}/{folder_images}]  ------  {str(datetime.now())[11:-7]}')
+        #if i % 200 == 0:
+            #print(f'Images loaded: [{i}/{folder_images}]  ------  {str(datetime.now())[11:-7]}')
         img, label = np.load(path + NPY, allow_pickle=True)
         data_x.append(img)
         numeric_label = make_numeric[label]

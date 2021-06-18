@@ -85,11 +85,6 @@ class Mask_n_pad(object):
             return np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
 
 
-T = transforms.Compose([Mask_n_pad(H=180, W=80),
-                        transforms.ToTensor(),
-                        transforms.Normalize(mean=[1., 1., 1., 1., 1., 1., 1., 1.],
-                                             std=[1., 1., 1., 1., 1., 1., 1., 1.])])
-
 
 class KornDataset(Dataset):
 
@@ -120,6 +115,10 @@ class KornDataset(Dataset):
 
 
 if __name__ == '__main__':
+    T = transforms.Compose([Mask_n_pad(H=180, W=80),
+                            transforms.ToTensor(),
+                            transforms.Normalize(mean=[1., 1., 1., 1., 1., 1., 1., 1.],
+                                                 std=[1., 1., 1., 1., 1., 1., 1., 1.])])
     path = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_blob/'
     label_path = 'C:/Users/Ext1306/PycharmProjects/Foss-autoencoder/preprocess/Classifier_labels.csv'
     Dataset = KornDataset(data_path=path, label_path=label_path,
