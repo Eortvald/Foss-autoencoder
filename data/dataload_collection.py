@@ -24,9 +24,9 @@ PATH = PATH_dict['gamer']
 # Transforms
 MEAN_8ch = np.load('../MEAN.npy')
 STD_8ch = np.load('../STD.npy')
-print(MEAN_8ch)
-T = transforms.Normalize(mean=MEAN_8ch, std=STD_8ch)
 
+Norm = transforms.Normalize(mean=MEAN_8ch, std=STD_8ch)
+TENS = transforms.ToTensor()
 
 
 
@@ -44,11 +44,11 @@ def npy_dir(path: str, subset: str):
                     'BarleyGreen': 5,
                     'Cleaved': 6,
                     'Skinned': 7}
-
+    data_t = []
     data_x = []
     data_y = []
 
-    folder = listdir(path)
+    folder = listdir(path)[:10]
     folder_images = len(folder)
     for i, NPY in tqdm(enumerate(folder)):
 
@@ -56,24 +56,39 @@ def npy_dir(path: str, subset: str):
             #print(f'Images loaded: [{i}/{folder_images}]  ------  {str(datetime.now())[11:-7]}')
         img, label = np.load(path + NPY, allow_pickle=True)
         data_x.append(img)
+
+        data_t.append(TENS(np.uint8(img)))
         numeric_label = make_numeric[label]
         data_y.append(numeric_label)
 
         # print(i,numeric_label)
 
     print(f'Done reading {subset} images')
-    wx = torch.tensor(data_x, dtype=torch.float)
+
+    print('new',data_t[0][0][40:50][0])
+    print(data_t[0].size())
+    wx = torch.tensor(data_x)
     print('Beginning permute')
-    tx = wx.permute(0, 3, 1, 2)
+    wx = wx.permute(0, 3, 1, 2)
+    print(wx.size())
+    print('old', wx[0][0][40:50][0])
+
     print('Finished permute')
+
     ty = torch.tensor(data_y, dtype=torch.long)
-    print(f'Dimension of X is :{tx.size()}')
-    print(tx[0])
+    #print(f'Dimension of X is :{tx.size()}')
+
     print('Beginning Norm transform')
-    tx = T(tx)
+    tx = Norm(data_t)
+    wx = Norm(wx)
+    print('new',tx[0][0][40:50][0])
+    print('old',wx[0][0][40:50][0])
     print('Norm transform finished')
+    quit()
     print(f'Dimension of X is :{tx.size()}------------')
-    print(tx[0])
+
+    #print(tx[0])
+    print(wx[0])
     return tx, ty
 
 
