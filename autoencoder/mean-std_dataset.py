@@ -2,6 +2,7 @@ import numpy as np
 import torch, torchvision
 from torch import nn
 import datetime
+from tqdm import tqdm
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, TensorDataset
 from os import listdir
@@ -23,38 +24,41 @@ s = np.load('../10K_std.npy')
 print(f'mean: {m}\n std:{s}')
 
 
-S = transforms.Compose([Mask_n_pad(H=180, W=80)])
+S = transforms.Compose([Mask_n_pad(H=180, W=80), transforms.ToTensor()])
 Dataset = KornDataset(data_path=path, transform=S, label_path=None)
 
-print(Dataset[8][0])
+batchsize = 2000
+print(120000/batchsize)
 
-STATloader = DataLoader(Dataset, batch_size=1000, num_workers=0)
+STATloader = DataLoader(Dataset, batch_size=batchsize, num_workers=0)
 
 Tens = transforms.ToTensor()
 
 means = []
 stds = []
 
+run_mean = 0
+run_std = 0
 
-for inputs, label in STATloader:
+for inputs, label in tqdm(STATloader, colour='green'):
     #print(inputs[0][0][80:90])
     temp_mean = torch.mean(inputs, dim=(0, 2, 3))
-    print(temp_mean)
     temp_std = torch.std(inputs, dim=(0, 2, 3))
 
-    means.append(temp_mean)
-    stds.append(temp_std)
+    run_mean += temp_mean
+    run_std += temp_std
 
 
 
-mean = torch.mean(means, dim=(0, 2, 3))
-std = torch.std(stds, dim=(0, 2, 3))
+run_mean /= 120000/batchsize
+run_std /= 120000/batchsize
 
-np.save('../MEAN', mean)
-np.save('../STD', std)
 
-print(mean)
-print(std)
+np.save('../MEAN', run_mean)
+np.save('../STD', run_std)
+
+print(run_mean)
+print(run_std)
 
 
 
