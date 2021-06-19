@@ -89,7 +89,7 @@ def test_AE(model, test_loader):
     test_loss /= len(test_loader.dataset)
     print(f'\t \t \t Test Error: Avg loss: {test_loss:.7f} \n')
 
-    if epoch % 10 == 0:
+    if epoch+1 % 10 == 0:
         save_images(X, X_hat)
 
 
