@@ -28,7 +28,7 @@ PATH_dict = {
     'validation_blob': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_blob/',
     'grainmix': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/grainmix/'
 }
-
+labels = ['Oat','Broken', 'Rye', 'Wheat', 'BarleyGreen','Cleaved', 'Skinned','Barley']
 DATA_SET = 'validation_blob'
 PATH = PATH_dict[DATA_SET]
 
@@ -42,53 +42,48 @@ TFORM = transforms.Compose([Mask_n_pad(H=180, W=80), transforms.ToTensor(), tran
 
 traindata = KornDataset(data_path=PATH, transform=TFORM,
                         label_path=label_path)
-trainload = DataLoader(traindata, batch_size=2, shuffle=True, num_workers=0)
-
-for i in range(100):
-    img, label = traindata[i]
+trainload = DataLoader(traindata, batch_size=100, shuffle=True, num_workers=0)
 
 
+data = {'value': [], 'feature': [], 'grain': []}
+df = pd.DataFrame.from_dict(data)
+Features = np.array([f'[{i+1}]' for i in range(30)])
+for i ,(imgs, labels) in enumerate(trainload):
+    imgs = imgs.to(device)
+    tens = ENCO(imgs)
+    imgs = tens.detach().cpu().numpy()
+    for img, label in tqdm(zip(imgs, labels)):
+        for value, feature in zip(img**2,Features):
+            new_row = {'value': value, 'feature': feature, 'grain': label}
+            df = df.append(new_row, ignore_index=True)
+    if i == 10:
+        break
+print(df[30:45])
+
+
+print(df.head())
+
+ax = sns.pointplot(x="feature", y="value", hue="grain",
+                   data=df, palette="Set2")
 
 
 
-
-
-
-
-feature_class_vectors = {'Oat': 1,
-                         'Broken': 2,
-                         'Rye': 3,
-                         'Wheat': 4,
-                         'BarleyGreen': 5,
-                         'Cleaved': 6,
-                         'Skinned': 7,
-                         'Barley*': 8}
-
-
-
-
-tips = sns.load_dataset("tips")
-tips.pop("tip")
-tips.pop("smoker")
-tips.pop("time")
-tips.pop("size")
-print(tips.head())
-sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
-g = sns.catplot(x='day', y='total_bill', row='sex', hue='sex', data=tips, kind='bar', dodge=False, saturation=.5,
-                ci=None, aspect=0.9)
-g.map(plt.axhline, y=0, lw=2, clip_on=False)
-g.fig.set_figheight(7)
-g.fig.set_figwidth(10)
-
-# def axla(sex):
-#     plt.gca().text(-.02, .2, "sex", fontweight="bold",
-#             ha="right", va="center", transform=plt.gca().transAxes)
-# g.map(axla,"sex")
-
-
-g.fig.subplots_adjust(hspace=0.2)
-# g.set_titles(" ")
-
-g.set(yticks=[])
-g.despine(bottom=True, left=True)
+# sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
+# g = sns.catplot(x='feature', y='value', row='grain', hue='grain', data=df, kind='bar', dodge=False, saturation=.5,
+#                 ci=None, aspect=0.9)
+# g.map(plt.axhline, y=0, lw=2, clip_on=False)
+# g.fig.set_figheight(9)
+# g.fig.set_figwidth(5)
+#
+# # def axla(sex):
+# #     plt.gca().text(-.02, .2, "sex", fontweight="bold",
+# #             ha="right", va="center", transform=plt.gca().transAxes)
+# # g.map(axla,"sex")
+#
+#
+# g.fig.subplots_adjust(hspace=0.2)
+# # g.set_titles(" ")
+#
+# g.set(yticks=[])
+# g.despine(bottom=True, left=True)
 plt.show()

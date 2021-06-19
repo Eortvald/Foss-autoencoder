@@ -54,6 +54,7 @@ class Mask_n_pad(object):
         """
 
         # Apply mask
+
         mask = img[:, :, 7]
         img = np.where(mask[..., None] != 0, img, [0., 0., 0., 0., 0., 0., 0., 0.])
 
@@ -83,7 +84,8 @@ class Mask_n_pad(object):
                 rw2 = (self.W - w - 1) / 2
 
             # Zero padding
-            return np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
+            img = np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
+            return img.astype('float32')
 
 
 
@@ -102,9 +104,7 @@ class KornDataset(Dataset):
         img = np.load(self.data_files[index])
 
         if self.transform:
-
-            img = self.transform(np.float32(img))
-            img = img.to(torch.float)
+            img = self.transform(img)
 
 
         if self.get_label:
@@ -112,7 +112,7 @@ class KornDataset(Dataset):
             label = str(self.labels.loc[im][0:7][self.labels.loc[im][0:7] == True]).split(' ')[0]
             return img, label
 
-        return img, '_'
+        return img, 'N/A'
 
     def __len__(self):
         return len(self.data_files)
