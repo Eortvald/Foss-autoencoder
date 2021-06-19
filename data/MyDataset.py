@@ -99,8 +99,12 @@ class KornDataset(Dataset):
 
     def __getitem__(self, index):
         img = np.load(self.data_files[index]).astype(float)
+
         if self.transform:
-            img = self.transform(img)
+            img = self.transform(np.float32(img))
+
+            if img.dtype != 'float32':
+                raise Exception(f'Image was found to of type {img.dtype} - Standardization may be applied wrong')
 
 
         if self.get_label:

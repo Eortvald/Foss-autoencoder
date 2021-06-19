@@ -18,8 +18,8 @@ PATH_dict = {
 
 path = PATH_dict['validation']
 
-m = np.load('../MEAN.npy')
-s = np.load('../STD.npy')
+mu = np.load('../MEAN.npy')
+std = np.load('../STD.npy')
 
 print(f'mean: {m}\n std:{s}')
 

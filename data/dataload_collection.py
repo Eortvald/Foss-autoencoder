@@ -22,10 +22,10 @@ PATH_dict = {
 PATH = PATH_dict['gamer']
 
 # Transforms
-MEAN_8ch = np.load('../MEAN.npy')
-STD_8ch = np.load('../STD.npy')
+MEAN = np.load('../MEAN.npy')
+STD = np.load('../STD.npy')
 
-Norm = transforms.Normalize(mean=MEAN_8ch, std=STD_8ch)
+Norm = transforms.Normalize(mean=MEAN, std=STD)
 TENS = transforms.ToTensor()
 
 
@@ -44,51 +44,28 @@ def npy_dir(path: str, subset: str):
                     'BarleyGreen': 5,
                     'Cleaved': 6,
                     'Skinned': 7}
-    data_t = []
+
     data_x = []
     data_y = []
 
-    folder = listdir(path)[:10]
+    folder = listdir(path)[:100]
     folder_images = len(folder)
-    for i, NPY in tqdm(enumerate(folder)):
 
-        #if i % 200 == 0:
-            #print(f'Images loaded: [{i}/{folder_images}]  ------  {str(datetime.now())[11:-7]}')
+    for NPY in tqdm(folder):
+
         img, label = np.load(path + NPY, allow_pickle=True)
-        data_x.append(img)
+        data_x.append(TENS(np.float32(img)))
+        data_y.append(make_numeric[label])
 
-        data_t.append(TENS(np.uint8(img)))
-        numeric_label = make_numeric[label]
-        data_y.append(numeric_label)
-
-        # print(i,numeric_label)
-
-    print(f'Done reading {subset} images')
-
-    print('new',data_t[0][0][40:50][0])
-    print(data_t[0].size())
-    wx = torch.tensor(data_x)
-    print('Beginning permute')
-    wx = wx.permute(0, 3, 1, 2)
-    print(wx.size())
-    print('old', wx[0][0][40:50][0])
-
-    print('Finished permute')
-
+    print(f'Done reading folder {subset} images')
+    tx = torch.stack(data_x)
+    print(tx.size())
     ty = torch.tensor(data_y, dtype=torch.long)
-    #print(f'Dimension of X is :{tx.size()}')
 
-    print('Beginning Norm transform')
-    tx = Norm(data_t)
-    wx = Norm(wx)
-    print('new',tx[0][0][40:50][0])
-    print('old',wx[0][0][40:50][0])
-    print('Norm transform finished')
-    quit()
+    print('Applying Norm transform')
+    tx = Norm(tx)
     print(f'Dimension of X is :{tx.size()}------------')
 
-    #print(tx[0])
-    print(wx[0])
     return tx, ty
 
 

@@ -60,3 +60,5 @@ class CAE(nn.Module):
         Z = self.encode(x)
         X_hat = self.decode(Z)
         return X_hat
+
+
