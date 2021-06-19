@@ -1,7 +1,8 @@
 import numpy as np
 from tqdm import tqdm
+import timeit
 import matplotlib.pyplot as plt
-import torch, torchvision
+import torch, torchvision, gc
 from torch import nn, optim
 from datetime import *
 from torchvision import datasets, transforms
@@ -10,7 +11,7 @@ from torch.utils.data import DataLoader
 from CAE_model import *
 from data.MyDataset import *
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cuda:1' if torch.cuda.is_available() else 'cpu'
 print(f'Using {device} device')
 
 
@@ -23,11 +24,11 @@ def to_img(img):
     return img
 
 
-def show_images(x, xhat):
+def save_images(x, xhat, show=False):
     x = to_img(x)
     xhat = to_img(xhat)
 
-    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(4, 9))
+    fig1, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(4, 5))
 
     ax1.imshow(x)
     ax1.set_title('Input Image')
@@ -38,8 +39,10 @@ def show_images(x, xhat):
     for ax in [ax1, ax2]:
         ax.set_xticks([])
         ax.set_yticks([])
-    plt.savefig(f"../plots/autoencoder-plots/images/img_{epoch}-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png")
-    plt.show()
+    fig1.savefig(f"../plots/autoencoder-plots/images/img_{epoch}-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png")
+    plt.close(fig1)
+    if show:
+        plt.show()
 
 
 # Train function
@@ -55,6 +58,7 @@ def train_AE(model, train_loader):
         optimizer.zero_grad()
         X_hat = model(X)
 
+
         loss = criterion(X_hat, X)
         loss.backward()
         train_loss += loss.item()
@@ -64,10 +68,10 @@ def train_AE(model, train_loader):
             print(100 * '~')
             progress = batch_num * len(X)
             print(
-                f'Batch[{batch_num}] - Batch loss:{loss.item()}\t | Avg. per. Image Loss: {loss.item() / len(X)}) [{progress}/{dataset_size}]')
+                f'Batch[{batch_num}/{int(dataset_size/BSIZE)}]-loss:{loss.item():.6f}\t | Image Loss: {loss.item() / len(X):.7f} [{progress}/{dataset_size}]')
 
     train_loss /= dataset_size
-    print(f'\t \t Train Error: Avg loss: {train_loss}')
+    print(f'\t \t Train Error: Avg loss: {train_loss:.7f}')
     print(100 * '^')
     return train_loss
 
@@ -77,16 +81,16 @@ def test_AE(model, test_loader):
     test_loss = 0
 
     with torch.no_grad():
-        for i, (X, _) in enumerate(test_loader):
+        for (X, _) in tqdm(test_loader):
             X = X.to(device)
             X_hat = model(X)
             test_loss += criterion(X_hat, X).item()
 
     test_loss /= len(test_loader.dataset)
-    print(f'\t \t \t Test Error: Avg loss: {test_loss} \n')
+    print(f'\t \t \t Test Error: Avg loss: {test_loss:.7f} \n')
 
     if epoch % 10 == 0:
-        show_images(X, X_hat)
+        save_images(X, X_hat)
 
 
     return test_loss
@@ -116,26 +120,26 @@ if __name__ == "__main__":
 
     # Training conditions
     BSIZE = 100
-    num_epochs = 100
+    num_epochs = 10
     learning_rate = 1e-3
     w_decay = 1e-5
-
+    PIN = False
     # Bottleneck layer size
     z_dim = 30
-
+    torch.cuda.empty_cache()
+    torch.backends.cudnn.benchmark = True
     # Dataset Init
-    traindata = KornDataset(data_path=PATH, transform=TFORM)  # the dataset object can be indexed like a regular list
-    trainload = DataLoader(traindata, batch_size=BSIZE, shuffle=True, num_workers=0)
+    traindata = KornDataset(data_path=PATH+'/train/', transform=TFORM)  # the dataset object can be indexed like a regular list
+    trainload = DataLoader(traindata, batch_size=BSIZE, shuffle=True, num_workers=0, pin_memory=PIN)
     train_log = []
 
-    testdata = KornDataset(data_path=PATH, transform=TFORM)
-    testload = DataLoader(testdata, batch_size=BSIZE, shuffle=True,  num_workers=0)
+    testdata = KornDataset(data_path=PATH+'/test/', transform=TFORM)
+    testload = DataLoader(testdata, batch_size=BSIZE, shuffle=True,  num_workers=0, pin_memory=PIN)
     test_log = []
 
     # Model Inite
     CAE_10Kmodel = CAE(z_dim=z_dim)
     CAE_10Kmodel = CAE_10Kmodel.to(device)
-
     # Loss and Backwards settings
     criterion = nn.MSELoss()
     optimizer = optim.Adam(CAE_10Kmodel.parameters(), lr=learning_rate, weight_decay=w_decay)
@@ -144,8 +148,9 @@ if __name__ == "__main__":
 
 
     # Training and test of model
-
+    start_time = timeit.default_timer()
     for epoch in range(num_epochs):
+
         print(f'\n\t\t------------------------------Epoch: {epoch + 1}------------------------------')
         train_save = train_AE(CAE_10Kmodel, trainload)
         train_log.append(train_save)
@@ -154,20 +159,25 @@ if __name__ == "__main__":
         test_save = test_AE(CAE_10Kmodel, testload)
         test_log.append(test_save)
 
+    end_time = timeit.default_timer() - start_time
+    print(end_time)
     print(f'Length of train log: {len(train_log)}')
     print(f'Length of test log: {len(test_log)}')
     print(train_log)
 
-    torch.save(CAE_10Kmodel.state_dict(), 'model_dicts/CAE_10Kmodel.pth')
+    SESSION = str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')
 
-    np.savez('model_dicts/session_results', train_log, test_log)
-    np.save('model_dicts/test_results', test_log, allow_pickle=False)
+    torch.save(CAE_10Kmodel.state_dict(), f'model_dicts/CAE_{SESSION}.pth')
 
-    plt.plot(np.arange(len(train_log)), train_log, label='Train')
-    plt.plot(np.arange(len(test_log)), test_log, label='Test')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.grid(axis='both', color='0.95')
-    plt.title(f"Train vs Test \t - {DATA_SET} \nBatch size:{BSIZE} | z_dim:{z_dim} | Dataset size:{len(trainload.dataset)}" )
-    plt.legend()
-    plt.savefig(f"../plots/autoencoder-plots/CAE_10K_Results-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png")
+    np.savez(f'model_dicts/session_results-{SESSION}', train_log, test_log)
+
+    figR, ax = plt.subplots()
+    ax.plot(train_log, label='Train')
+    ax.plot(test_log, label='Test')
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Loss')
+    ax.set_title(f"Train vs Test \t - {DATA_SET} \nBatch size:{BSIZE} | z_dim:{z_dim} | Dataset size:{len(trainload.dataset)}")
+    ax.legend()
+    figR.savefig(f"../plots/autoencoder-plots/session_results-{SESSION}.png")
+
+

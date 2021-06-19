@@ -10,6 +10,7 @@ from torchvision import datasets, transforms
 from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 from CAE_model import *
+from data.MyDataset import *
 #from data.dataload_collection import *
 import torch, torchvision
 import matplotlib.pyplot as plt
@@ -17,16 +18,35 @@ from datetime import *
 import autoencoder, classifier, preprocess
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+MEAN = np.load('../MEAN.npy')
+STD = np.load('../STD.npy')
 
+label_path = '../preprocess/Classifier_labels.csv'
+PATH_dict = {
+    '10K_remote': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
+    '10K_gamer': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/tenkblobs/',
+    '224': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/',
+    'validation_grain': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_grain/',
+    'validation_blob': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_blob/',
+    'grainmix': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/grainmix/'
+}
+
+DATA_SET = 'validation_blob'
+PATH = PATH_dict[DATA_SET]
+
+# Autoencoder setup
 X = torch.ones([4, 8,180,80]).to(device)
 
 aemodel = CAE(z_dim=30).to(device)
 aemodel.load_state_dict(torch.load('model_dicts/CAE_10Kmodel.pth', map_location=device))
 aemodel.eval()
-ENCO = lambda img : aemodel.encode(img)
-#for i, (data, label) in enumerate(dataloader):
- #   ENCO(data)
+ENCO = lambda img: aemodel.encode(img)
 
+
+TFORM = transforms.Compose([Mask_n_pad(H=180, W=80), transforms.ToTensor(), transforms.Normalize(mean=MEAN, std=STD)])
+
+traindata = KornDataset(data_path=PATH, transform=TFORM)  # the dataset object can be indexed like a regular list
+trainload = DataLoader(traindata, batch_size=1, shuffle=True, num_workers=0)
 
 #Making data matrixes for each class
 row = np.arange(30)

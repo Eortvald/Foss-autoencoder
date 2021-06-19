@@ -30,17 +30,17 @@ run3 = [0.003483321204781532, 0.002242457838729024, 0.0019355349671095609, 0.001
 # np.save('run1.npy',run1)
 
 
-plotrun = np.array(run1[1:])
+
+fig, ax = plt.subplots()  # Create a figure and an axes.
+ax.plot(run1, label='linear')  # Plot some data on the axes.
+ax.plot(run2, label='quadratic')  # Plot more data on the axes...
+ax.set_xlabel('Epoch')  # Add an x-label to the axes.
+ax.set_ylabel('Loss')  # Add a y-label to the axes.
+ax.set_title("Train vs Test")  # Add a title to the axes.
+ax.legend()  # Add a legend.
+fig.savefig(filename)
 
 
-plt.plot(run1, label='Old Norm')
-plt.plot(run2, label='New Norm')
-plt.plot(run3, label='d')
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.title("Train vs Test")
-plt.legend()
-plt.show()
 
 
 
