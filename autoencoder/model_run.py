@@ -144,7 +144,7 @@ if __name__ == "__main__":
     criterion = nn.MSELoss()
     optimizer = optim.Adam(CAE_10Kmodel.parameters(), lr=learning_rate, weight_decay=w_decay)
 
-
+    # https://towardsdatascience.com/pytorch-tabular-multiclass-classification-9f8211a123ab
 
 
     # Training and test of model
