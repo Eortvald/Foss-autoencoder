@@ -124,11 +124,11 @@ if __name__ == "__main__":
     z_dim = 30
 
     # Dataset Init
-    traindata = KornDataset(data_path=path, transform=TFORM)  # the dataset object can be indexed like a regular list
+    traindata = KornDataset(data_path=PATH, transform=TFORM)  # the dataset object can be indexed like a regular list
     trainload = DataLoader(traindata, batch_size=BSIZE, shuffle=True, num_workers=0)
     train_log = []
 
-    testdata = KornDataset(data_path=path, transform=TFORM)
+    testdata = KornDataset(data_path=PATH, transform=TFORM)
     testload = DataLoader(testdata, batch_size=BSIZE, shuffle=True,  num_workers=0)
     test_log = []
 

@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 # PATH = PATH_dict['']    # add 2017 to mother dict first
 # PATH = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
-
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def _load_pickle_file(path):
     infile = open(path, 'rb')
@@ -98,13 +98,18 @@ class KornDataset(Dataset):
             self.get_label = True
 
     def __getitem__(self, index):
-        img = np.load(self.data_files[index]).astype(float)
+        img = np.load(self.data_files[index])
 
         if self.transform:
-            img = self.transform(np.float32(img))
-
+            img = np.float32(img)
             if img.dtype != 'float32':
                 raise Exception(f'Image was found to of type {img.dtype} - Standardization may be applied wrong')
+
+            img = self.transform(img)
+            img = img.to(torch.float)
+            img = img.to(device)
+
+
 
 
         if self.get_label:

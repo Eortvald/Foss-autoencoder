@@ -29,20 +29,20 @@ class CAE(nn.Module):
         )
 
         # ============ Z layer ============#
-        self.fcZ = nn.Linear(2688,z_dim)
+        self.fcZ = nn.Linear(2016,z_dim)
 
 
         #================================ Decoder ==============================#
-        self.decoder_brigde = nn.Linear(z_dim, 2688)
+        self.decoder_brigde = nn.Linear(z_dim, 2016)
         self.decoder = nn.Sequential(
-            nn.Unflatten(1,(24,16,7)),
-            nn.ConvTranspose2d(24, 18, 4, stride=2, padding=1, bias = False),
+            nn.Unflatten(1,(24,14,6)),
+            nn.ConvTranspose2d(24, 18, kernel_size=4, stride=2, padding=1, output_padding=1, bias = False),
             nn.BatchNorm2d(18),
             nn.ReLU(True),
-            nn.ConvTranspose2d(18, 12, 4, stride=2, padding=[0,1], output_padding=[0,1], bias = False),
+            nn.ConvTranspose2d(18, 12, kernel_size=4, stride=2, padding=1, output_padding=[1,0], bias = False),
             nn.BatchNorm2d(12),
             nn.ReLU(True),
-            nn.ConvTranspose2d(12, 8, 5, stride=3, padding=[1,0], output_padding=[2,0]),
+            nn.ConvTranspose2d(12, 8, kernel_size=5, stride=3, padding=0, output_padding=[1,0]),
             nn.Tanh()
         )
 
@@ -62,3 +62,10 @@ class CAE(nn.Module):
         return X_hat
 
 
+if __name__ == '__main__':
+
+
+
+    model = CAE(30)
+    batch_size = 16
+    summary(model, input_size=(batch_size, 8, 180, 80), col_names=["input_size", "output_size","kernel_size"])

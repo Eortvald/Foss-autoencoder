@@ -41,3 +41,6 @@ plt.ylabel('Loss')
 plt.title("Train vs Test")
 plt.legend()
 plt.show()
+
+
+
