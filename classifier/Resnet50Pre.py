@@ -14,10 +14,10 @@ import copy
 num_classes = 7
 
 # Batch size for training (change depending on how much memory you have)
-batch_size = 500
+batch_size = 8
 
 # Number of epochs to train for
-num_epochs = 200
+num_epochs = 2
 
 # Flag for feature extracting. When False, we finetune the whole model,
 #   when True we only update the reshaped layer params
@@ -101,6 +101,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs):
             # deep copy the model
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
+                best_epoch = epoch
                 best_model_wts = copy.deepcopy(model.state_dict())
                 best_loss = epoch_loss
             if phase == 'val':
@@ -113,6 +114,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs):
     print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     print('Best val Acc: {:4f}'.format(best_acc))
     print('Best val loss: {:4f}'.format(best_loss))
+    print('Best val Epoch {:0f}'.format(best_epoch))
 
     # load best model weights
     model.load_state_dict(best_model_wts)
