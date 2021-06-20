@@ -32,7 +32,7 @@ def _make_data_list(root_path: str):
         with os.scandir(root_path + folder) as entries:
             for entry in entries:
                 data_list.append(root_path + folder + '/' + entry.name.split(".")[0] + '.npy')
-    return data_list[:10000]
+    return data_list
 
 
 class Mask_n_pad(object):
