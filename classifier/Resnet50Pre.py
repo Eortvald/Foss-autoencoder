@@ -89,7 +89,8 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs):
 
                 # statistics
                 running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
+                running_corrects += torch.sum(preds[1] == labels.data)
+
                 #if preds == labels.data:
                 #    print("yes")
                 #    running_corrects +=1
