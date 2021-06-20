@@ -119,7 +119,7 @@ if __name__ == "__main__":
     TFORM = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=MEAN, std=STD)])
 
     # Training conditions
-    BSIZE = 3000
+    BSIZE = 512
     num_epochs = 10
     learning_rate = 1e-3
     w_decay = 1e-5
@@ -160,6 +160,7 @@ if __name__ == "__main__":
         test_log.append(test_save)
 
     end_time = timeit.default_timer() - start_time
+
     print(end_time)
     print(f'Length of train log: {len(train_log)}')
     print(f'Length of test log: {len(test_log)}')
