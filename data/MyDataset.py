@@ -8,11 +8,12 @@ import os
 # from dataload_collection import PATH_dict
 import pickle
 import matplotlib.pyplot as plt
+import timeit
 
 
 # PATH = PATH_dict['']    # add 2017 to mother dict first
 # PATH = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
-
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def _load_pickle_file(path):
     infile = open(path, 'rb')
@@ -31,7 +32,7 @@ def _make_data_list(root_path: str):
         with os.scandir(root_path + folder) as entries:
             for entry in entries:
                 data_list.append(root_path + folder + '/' + entry.name.split(".")[0] + '.npy')
-    return data_list
+    return data_list[:10000]
 
 
 class Mask_n_pad(object):
@@ -53,6 +54,7 @@ class Mask_n_pad(object):
         """
 
         # Apply mask
+
         mask = img[:, :, 7]
         img = np.where(mask[..., None] != 0, img, [0., 0., 0., 0., 0., 0., 0., 0.])
 
@@ -82,13 +84,9 @@ class Mask_n_pad(object):
                 rw2 = (self.W - w - 1) / 2
 
             # Zero padding
-            return np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
+            img = np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
+            return img.astype('float32')
 
-
-T = transforms.Compose([Mask_n_pad(H=180, W=80),
-                        transforms.ToTensor(),
-                        transforms.Normalize(mean=[1., 1., 1., 1., 1., 1., 1., 1.],
-                                             std=[1., 1., 1., 1., 1., 1., 1., 1.])])
 
 
 class KornDataset(Dataset):
@@ -103,7 +101,8 @@ class KornDataset(Dataset):
             self.get_label = True
 
     def __getitem__(self, index):
-        img = np.load(self.data_files[index]).astype(float)
+        img = np.load(self.data_files[index])
+
         if self.transform:
             img = self.transform(img)
 
@@ -113,20 +112,57 @@ class KornDataset(Dataset):
             label = str(self.labels.loc[im][0:7][self.labels.loc[im][0:7] == True]).split(' ')[0]
             return img, label
 
-        return img, '_'
+        return img, 'N/A'
 
     def __len__(self):
         return len(self.data_files)
 
 
 if __name__ == '__main__':
-    path = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_blob/'
-    label_path = 'C:/Users/Ext1306/PycharmProjects/Foss-autoencoder/preprocess/Classifier_labels.csv'
-    Dataset = KornDataset(data_path=path, label_path=label_path,
-                          transform=T)  # the dataset object can be indexed like a regular list
-    img0, label0 = Dataset[0]
-    print(label0)
-    loader = DataLoader(Dataset, num_workers=2)
+
+    MEAN = np.load('../MEAN.npy')
+    STD = np.load('../STD.npy')
+
+    PATH_dict = {
+        '10K_remote': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
+        '10K_gamer': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/tenkblobs/',
+        '224': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/',
+        'validation_grain': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_grain/',
+        'validation_blob': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_blob/',
+        'grainmix': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/grainmix/'
+    }
+    DATA_SET = '10K_gamer'
+    PATH = PATH_dict[DATA_SET]
+
+    # T = transforms.Compose([Mask_n_pad(H=180, W=80), transforms.ToTensor(), transforms.Normalize(mean=MEAN, std=STD)])
+    # start_time1 = timeit.default_timer()
+    # traindata = KornDataset(data_path=PATH+'/train/', transform=T)
+    # trainload = DataLoader(traindata, batch_size=3000, shuffle=True, num_workers=0, pin_memory=False)
+    #
+    # for batch_num, (X, _) in enumerate(trainload):
+    #     # Regeneration and loss
+    #     print(batch_num)
+    # end_time1 = start_time = timeit.default_timer() - start_time1
+
+    S = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=MEAN, std=STD)])
+    start_time2 = timeit.default_timer()
+    td = KornDataset(data_path=PATH, transform=S)
+    tl = DataLoader(td, batch_size=3000, shuffle=True, num_workers=0, pin_memory=False)
+
+    for batch_num, (X, _) in enumerate(tl):
+        # Regeneration and loss
+        print(batch_num)
+    end_time2 = start_time = timeit.default_timer() - start_time2
+
+
+    #print(end_time1)
+    print(end_time2)
+
+
+
+
+
+
 
 '''
 # Test of classes
