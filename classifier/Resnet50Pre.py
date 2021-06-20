@@ -89,9 +89,10 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs):
 
                 # statistics
                 running_loss += loss.item() * inputs.size(0)
-                if preds == labels.data:
-                    print("yes")
-                    running_corrects +=1
+                running_corrects += torch.sum(preds == labels.data)
+                #if preds == labels.data:
+                #    print("yes")
+                #    running_corrects +=1
                 #running_corrects += torch.sum(preds == labels.data)
 
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
