@@ -5,23 +5,19 @@ from data.dataload_collection import Ktest_loader, Ktrain_loader
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import numpy as np
 import torchvision
 from torchsummary import summary
-from torchvision import models
-import matplotlib.pyplot as plt
 import time
-import os
 import copy
 
 # Number of classes in the dataset
 num_classes = 7
 
 # Batch size for training (change depending on how much memory you have)
-batch_size = 8
+batch_size = 500
 
 # Number of epochs to train for
-num_epochs = 3
+num_epochs = 200
 
 # Flag for feature extracting. When False, we finetune the whole model,
 #   when True we only update the reshaped layer params
@@ -50,6 +46,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs):
 
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
+
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
@@ -115,6 +112,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs):
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     print('Best val Acc: {:4f}'.format(best_acc))
+    print('Best val loss: {:4f}'.format(best_loss))
 
     # load best model weights
     model.load_state_dict(best_model_wts)
