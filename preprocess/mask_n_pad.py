@@ -10,16 +10,17 @@ def mask_n_pad_all(root_path, max_h = 180, max_w = 180):
 
         # looping through sub folders
         sub_folders = os.listdir(root_path + folder)
-        for sub in sub_folders:
+        for i, sub in enumerate(sub_folders):
 
             # Saving temporary path
+            print(f'Pickle loaded: [{i}/{len(sub_folders)}]  ------  {str(datetime.datetime.now())[11:-7]}')
             temp_path = root_path + folder + sub
 
             # looping through each image
             with os.scandir(temp_path) as entries:
                 for entry in entries:
-                    img = np.load(temp_path + entry)
-                    print(img.dtype, 'before process')
+                    img = np.load(entry, allow_pickle = True)
+                    print(entry)
 
                     #Apply mask
                     mask = img[:, :, 7]
@@ -52,11 +53,11 @@ def mask_n_pad_all(root_path, max_h = 180, max_w = 180):
                         img = np.pad(img, ((int(rh2), int(rh1)), (int(rw1), int(rw2)), (0, 0)), 'constant')
 
                         # Converting to float
-                        img = img.astype('float')
-                        print(img, 'after process')
+                        img = img.astype('float32')
 
                         # Saving image
-                        np.save(temp_path + entry, img)
+                        np.save(entry, img)
+
 
 
 root_paths = ['C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_grain/',
