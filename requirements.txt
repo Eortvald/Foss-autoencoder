@@ -88,3 +88,4 @@ webencodings==0.5.1
 widgetsnbextension==3.5.1
 tqdm
 torchinfo
+seaborn

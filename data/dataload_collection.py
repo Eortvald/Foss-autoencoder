@@ -22,11 +22,11 @@ PATH_dict = {
 PATH = PATH_dict['gamer']
 
 # Transforms
-MEAN_8ch = np.load('10K_mean.npy')
-STD_8ch = np.load('10K_std.npy')
+MEAN = np.load('../MEAN.npy')
+STD = np.load('../STD.npy')
 
-T = transforms.Normalize(mean=MEAN_8ch, std=STD_8ch)
-
+Norm = transforms.Normalize(mean=MEAN, std=STD)
+TENS = transforms.ToTensor()
 
 
 
@@ -48,32 +48,24 @@ def npy_dir(path: str, subset: str):
     data_x = []
     data_y = []
 
-    folder = listdir(path)
+    folder = listdir(path)[:100]
     folder_images = len(folder)
-    for i, NPY in enumerate(folder):
 
-        if i % 200 == 0:
-            print(f'Images loaded: [{i}/{folder_images}]  ------  {str(datetime.now())[11:-7]}')
+    for NPY in tqdm(folder):
+
         img, label = np.load(path + NPY, allow_pickle=True)
-        data_x.append(img)
-        numeric_label = make_numeric[label]
-        data_y.append(numeric_label)
+        data_x.append(TENS(np.float32(img)))
+        data_y.append(make_numeric[label])
 
-        # print(i,numeric_label)
-
-    print(f'Done reading {subset} images')
-    wx = torch.tensor(data_x, dtype=torch.float)
-    print('Beginning permute')
-    tx = wx.permute(0, 3, 1, 2)
-    print('Finished permute')
+    print(f'Done reading folder {subset} images')
+    tx = torch.stack(data_x)
+    print(tx.size())
     ty = torch.tensor(data_y, dtype=torch.long)
-    print(f'Dimension of X is :{tx.size()}')
-    print(tx[0])
-    print('Beginning Norm transform')
-    tx = T(tx)
-    print('Norm transform finished')
+
+    print('Applying Norm transform')
+    tx = Norm(tx)
     print(f'Dimension of X is :{tx.size()}------------')
-    print(tx[0])
+
     return tx, ty
 
 
