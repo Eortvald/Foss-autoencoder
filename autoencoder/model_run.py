@@ -116,10 +116,10 @@ if __name__ == "__main__":
 
 
 
-    TFORM = transforms.Compose([Mask_n_pad(H=180, W=80), transforms.ToTensor(), transforms.Normalize(mean=MEAN, std=STD)])
+    TFORM = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=MEAN, std=STD)])
 
     # Training conditions
-    BSIZE = 100
+    BSIZE = 1000
     num_epochs = 10
     learning_rate = 1e-3
     w_decay = 1e-5
