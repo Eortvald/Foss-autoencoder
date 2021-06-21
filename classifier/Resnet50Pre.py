@@ -27,7 +27,7 @@ feature_extract = True
 
 def buildResNet50Model(numClasses):
     # get the stock PyTorch ResNet50 model w/ pretrained set to True
-    model = torchvision.models.resnet34(pretrained=True)
+    model = torchvision.models.resnet50(pretrained=True)
 
     # freeze all model parameters so we don’t backprop through them during training (except the FC layer that will be replaced)
     for param in model.parameters():
@@ -168,10 +168,10 @@ model_ft, val_acc_history, val_loss_history, train_loss_history, train_acc_histo
 #val_acc_history1 = val_acc_history
 #train_acc_history1 = train_acc_history
 
-np.save('./res34test', torch.tensor(val_loss_history).cpu().numpy())
-np.save('./res34train', torch.tensor(train_loss_history).cpu().numpy())
-np.save('./res34acctest', torch.tensor(val_acc_history).cpu().numpy())
-np.save('./res34acctrain',torch.tensor(train_acc_history).cpu().numpy())
+np.save('./res50test', torch.tensor(val_loss_history).cpu().numpy())
+np.save('./res50train', torch.tensor(train_loss_history).cpu().numpy())
+np.save('./res50acctest', torch.tensor(val_acc_history).cpu().numpy())
+np.save('./res50acctrain',torch.tensor(train_acc_history).cpu().numpy())
 
 img_name = f"../plots/classifier-plots/ResNet_Results-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png"
 plt.plot(np.arange(len(train_loss_history)), train_loss_history, label='Train')  # etc.
@@ -180,6 +180,6 @@ minpos = val_loss_history.index(min(val_loss_history))
 plt.axvline(minpos, linestyle="--", color='r', label ='Minimum loss')
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
-plt.title("ResNet34: Train vs Test loss")
+plt.title("ResNet50: Train vs Test loss")
 plt.legend()
 plt.savefig(img_name, transparent=False)
