@@ -97,7 +97,7 @@ class KornDataset(Dataset):
         self.transform = transform
         self.get_label = False
         if self.label_path is not None:
-            self.labels = pd.read_csv(label_path).set_index(['Names'])
+            self.labels = pd.read_csv(label_path,low_memory=False).set_index(['Names'])
             self.get_label = True
 
     def __getitem__(self, index):

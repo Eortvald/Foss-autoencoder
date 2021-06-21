@@ -19,7 +19,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 MEAN = np.load('../MEAN.npy')
 STD = np.load('../STD.npy')
 
-label_path = '../preprocess/Classifier_labels.csv'
+label_path = '../preprocess/seventyk_labels.csv'
 PATH_dict = {
     '10K_remote': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
     '10K_gamer': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/tenkblobs/',
@@ -38,9 +38,9 @@ aemodel.load_state_dict(torch.load('model_dicts/PTH_Grain/CAE_69.pth', map_locat
 aemodel.eval()
 ENCO = lambda x: aemodel.encode(x)
 
-TFORM = transforms.Compose([Mask_n_pad(H=180, W=80), transforms.ToTensor(), transforms.Normalize(mean=MEAN, std=STD)])
+TFORM = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=MEAN, std=STD)])
 
-traindata = KornDataset(data_path=PATH, transform=TFORM,
+traindata = KornDataset(data_path=PATH+'/train/', transform=TFORM,
                         label_path=label_path)
 trainload = DataLoader(traindata, batch_size=1000, shuffle=True, num_workers=0)
 

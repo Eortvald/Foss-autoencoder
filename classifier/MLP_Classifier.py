@@ -3,9 +3,9 @@ import numpy as np
 from sklearn.metrics import accuracy_score
 import matplotlib.pylab as plt
 from torch import nn, optim
-from data.dataload_collection import *
+from data.MyDataset import *
 from autoencoder.CAE_model import *
-
+from datetime import *
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Using {device} device')
 
@@ -117,14 +117,12 @@ def model_evaluate(testdataloader, model, ENC):
             for la, pre in zip(label.detach().cpu().numpy(), yhat.detach().cpu().numpy()):
 
                 label_total[la] += 1
-
                 if pre == la:
                     label_correct[pre] += 1
                     correct += 1
                 total += 1
 
-                if pre != la:
-                    confusion[int(la-1)][int(pre-1)] += 1
+                confusion[int(la-1)][int(pre-1)] += 1
 
         print(confusion)
         ACC = 100 * float(correct) / total
@@ -149,43 +147,98 @@ def model_evaluate(testdataloader, model, ENC):
 
 if __name__ == "__main__":
 
-    X = torch.ones([1, 8, 180, 80]).to(device)
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    aemodel = CAE(z_dim=30).to(device)
-    aemodel.load_state_dict(torch.load('../autoencoder/model_dicts/CAE_10Kmodel.pth', map_location=device))
-    aemodel.eval()
+    MEAN = np.load('../MEAN.npy')
+    STD = np.load('../STD.npy')
 
-    ENCO = lambda img: aemodel.encode(img)
+    label_path = '../preprocess/Classifier_labels.csv'
+    PATH_dict = {
+        '10K_remote': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
+        '10K_gamer': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/tenkblobs/',
+        '224': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/',
+        'validation_grain': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_grain/',
+        'validation_blob': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_blob/',
+        'grainmix': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/grainmix/'
+    }
 
+    DATA_SET = 'validation_grain'
+    PATH = PATH_dict[DATA_SET]
+
+
+
+    BSIZE = 3000
     classes = ['Oat', 'Broken', 'Rye', 'Wheat', 'BarleyGreen', 'Cleaved', 'Skinned']
-    hidden_out = [18]
+    hidden_out = [16, 12, 10]
     ANN_10Kmodel = ANN(30, hidden_out)
     ANN_10Kmodel = ANN_10Kmodel.to(device)
-    learningrate = 0.001  # Insert LR
-    epochs = 50  # Insert epochs
+    num_epochs = 50
+    learning_rate = 1e-3
+    w_decay = 1e-5
+    PIN = True
+    torch.cuda.empty_cache()
+
+
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    aemodel = CAE(z_dim=30).to(device)
+    aemodel.load_state_dict(torch.load('../autoencoder/model_dicts/PTH_Grain/CAE_69.pth', map_location=device))
+    aemodel.eval()
+
+    TFORM = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=MEAN, std=STD)])
+    ENCO = lambda img: aemodel.encode(img)
+
+
+    traindata = KornDataset(data_path=PATH + '/train/', transform=TFORM)  # the dataset object can be indexed like a regular list
+    trainload = DataLoader(traindata, batch_size=BSIZE, shuffle=True, num_workers=0, pin_memory=PIN)
+
+    testdata = KornDataset(data_path=PATH + '/test/', transform=TFORM)
+    testload = DataLoader(testdata, batch_size=BSIZE, shuffle=True, num_workers=0, pin_memory=PIN)
+
 
     train_log = []
     test_log = []
 
-    for epoch in range(epochs):
+    start_time = timeit.default_timer()
+    for epoch in range(num_epochs):
         print(f'\n\t\t------------------------------Epoch: {epoch + 1}------------------------------')
-        tr_loss = train_model(traindataloader, ANN_10Kmodel, ENCO)
+        tr_loss = train_model(trainload, ANN_10Kmodel, ENCO)
         train_log.append(tr_loss)
 
         print('\t\t\t>>>>>>>>>>>>>>>>TEST RESULTS<<<<<<<<<<<<<<<<<')
-        te_loss = model_evaluate(testdataloader, ANN_10Kmodel, ENCO)
+
+        te_loss = model_evaluate(testload, ANN_10Kmodel, ENCO)
         test_log.append(te_loss)
 
-    torch.save(ANN_10Kmodel.state_dict(), 'classifier/model_dicts/ANN_10Kmodel.pth')
+        torch.save(ANN_10Kmodel.state_dict(), f'classifier/model_dicts/ANN_{num_epochs}.pth')
 
-    img_name = f"plots/classifier-plots/ANN_10K_Results-{str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')}.png"
-    plt.plot(np.arange(len(train_log)), train_log, label='Train')  # etc.
-    plt.plot(np.arange(len(test_log)), test_log, label='Test')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.title("Train vs Test loss")
-    plt.legend()
-    plt.savefig(img_name, transparent=False)
+    end_time = timeit.default_timer() - start_time
+
+    print(end_time)
+
+
+
+    torch.save(ANN_10Kmodel.state_dict(), 'classifier/model_dicts/ANN_Big.pth')
+
+    SESSION = str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')
+    np.savez(f'model_dicts/session_results-{SESSION}', train_log, test_log)
+
+    figR, ax = plt.subplots()
+    ax.plot(train_log, label='Train')
+    ax.plot(test_log, label='Test')
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Loss')
+    ax.set_title(f"Train vs Test \t - {DATA_SET} \nBatch size:{BSIZE} | Dataset size:{len(trainload.dataset)}")
+    ax.legend()
+    figR.savefig(f"../plots/autoencoder-plots/session_results-{SESSION}.png")
+
+
+
+
+    # https://towardsdatascience.com/pytorch-tabular-multiclass-classification-9f8211a123ab
+
+
+
+
+
+
 
 
 """
