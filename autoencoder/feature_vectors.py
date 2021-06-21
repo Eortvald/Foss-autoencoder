@@ -34,7 +34,7 @@ PATH = PATH_dict[DATA_SET]
 
 # Autoencoder setup
 aemodel = CAE(z_dim=30).to(device)
-aemodel.load_state_dict(torch.load('model_dicts/CAE_10Kmodel.pth', map_location=device))
+aemodel.load_state_dict(torch.load('model_dicts/PTH_Grain/CAE_69.pth', map_location=device))
 aemodel.eval()
 ENCO = lambda x: aemodel.encode(x)
 
@@ -42,7 +42,7 @@ TFORM = transforms.Compose([Mask_n_pad(H=180, W=80), transforms.ToTensor(), tran
 
 traindata = KornDataset(data_path=PATH, transform=TFORM,
                         label_path=label_path)
-trainload = DataLoader(traindata, batch_size=100, shuffle=True, num_workers=0)
+trainload = DataLoader(traindata, batch_size=1000, shuffle=True, num_workers=0)
 
 
 data = {'value': [], 'feature': [], 'grain': []}
@@ -63,27 +63,26 @@ print(df[30:45])
 
 print(df.head())
 
-ax = sns.pointplot(x="feature", y="value", hue="grain",
-                   data=df, palette="Set2")
+#ax = sns.pointplot(x="feature", y="value", hue="grain",data=df, palette="Set2")
 
 
 
-# sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
-# g = sns.catplot(x='feature', y='value', row='grain', hue='grain', data=df, kind='bar', dodge=False, saturation=.5,
-#                 ci=None, aspect=0.9)
-# g.map(plt.axhline, y=0, lw=2, clip_on=False)
-# g.fig.set_figheight(9)
-# g.fig.set_figwidth(5)
-#
-# # def axla(sex):
-# #     plt.gca().text(-.02, .2, "sex", fontweight="bold",
-# #             ha="right", va="center", transform=plt.gca().transAxes)
-# # g.map(axla,"sex")
-#
-#
-# g.fig.subplots_adjust(hspace=0.2)
-# # g.set_titles(" ")
-#
-# g.set(yticks=[])
-# g.despine(bottom=True, left=True)
+sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
+g = sns.catplot(x='feature', y='value', row='grain', hue='grain', data=df, kind='bar', dodge=False, saturation=.5,
+                ci=None, aspect=0.9)
+g.map(plt.axhline, y=0, lw=2, clip_on=False)
+g.fig.set_figheight(9)
+g.fig.set_figwidth(5)
+
+# def axla(sex):
+#     plt.gca().text(-.02, .2, "sex", fontweight="bold",
+#             ha="right", va="center", transform=plt.gca().transAxes)
+# g.map(axla,"sex")
+
+
+g.fig.subplots_adjust(hspace=0.2)
+# g.set_titles(" ")
+
+g.set(yticks=[])
+g.despine(bottom=True, left=True)
 plt.show()

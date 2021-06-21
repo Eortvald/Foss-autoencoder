@@ -9,8 +9,7 @@ from autoencoder.CAE_model import *
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Using {device} device')
 
-traindataloader = Ktrain_loader
-testdataloader = Ktest_loader
+
 
 
 # ANN Definition
@@ -150,10 +149,10 @@ def model_evaluate(testdataloader, model, ENC):
 
 if __name__ == "__main__":
 
-    X = torch.ones([1, 8, 200, 89]).to(device)
+    X = torch.ones([1, 8, 180, 80]).to(device)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     aemodel = CAE(z_dim=30).to(device)
-    aemodel.load_state_dict(torch.load('./autoencoder/model_dicts/CAE_10Kmodel.pth', map_location=device))
+    aemodel.load_state_dict(torch.load('../autoencoder/model_dicts/CAE_10Kmodel.pth', map_location=device))
     aemodel.eval()
 
     ENCO = lambda img: aemodel.encode(img)
