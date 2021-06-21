@@ -101,7 +101,7 @@ class KornDataset(Dataset):
 
     def __init__(self, data_path, label_path=None, transform=None):
         self.label_path = label_path
-        self.data_files = _make_data_list(data_path)
+        self.data_files = _make_data_list(data_path)[:30000]
         self.transform = transform
         self.get_label = False
         if self.label_path is not None:
