@@ -47,6 +47,8 @@ def train_model(traindataloader, model, ENC):
     dataset_size = len(traindataloader.dataset)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=learningrate, momentum=0.9)
+    #optimizer = optim.Adam(model.parameters(), lr=learningrate)
+
 
     for i, (inputs, label) in enumerate(traindataloader):
         # ENCODER HERE

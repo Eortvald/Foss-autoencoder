@@ -13,13 +13,14 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 PATH_dict = {
     '10K': 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs/',
     'gamer': 'C:/Data/DeepEye/Foss_student/tenkblobs/',
+    'gamer224': 'C:/Data/DeepEye/Foss_student/tenkblobs224/',
     '224' : 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/',
     'validation' : 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/validation_grain/'
 }
 
 ### If training on Foss Laptop select '10K'
 ### If training on Gamer select 'gamer'
-PATH = PATH_dict['gamer']
+PATH = PATH_dict['gamer224']
 
 # Transforms
 MEAN = np.load('../MEAN.npy')
@@ -48,7 +49,7 @@ def npy_dir(path: str, subset: str):
     data_x = []
     data_y = []
 
-    folder = listdir(path)[:100]
+    folder = listdir(path)
     folder_images = len(folder)
 
     for NPY in tqdm(folder):

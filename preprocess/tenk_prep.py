@@ -9,7 +9,7 @@ n = 0
 i = 0
 #Path to root of images
 path = 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/BlobArchive_v2/'
-savepath = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenhblobsA/'
+savepath = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/Foss_student/tenkblobs224/'
 
 #Labels
 df = pd.read_csv('Classifier_labels.csv')
@@ -38,10 +38,10 @@ while n < 10000:
         elif (hei % 2) == 1:
             rhei1 = (max_h - hei + 1) / 2
             rhei2 = (max_h - hei - 1) / 2
-        if (wid % 2) == 1:
+        if (wid % 2) == 0:
             rwid1 = (max_w - wid) / 2
             rwid2 = (max_w - wid) / 2
-        elif (wid % 2) == 0:
+        elif (wid % 2) == 1:
             rwid1 = (max_w - wid + 1) / 2
             rwid2 = (max_w - wid - 1) / 2
 
@@ -59,7 +59,7 @@ while n < 10000:
         label = str(df.loc[i][1:8][df.loc[i][1:8] == True]).split(' ')[0]
 
         #New array that contains image and label
-        img_labeled = np.array([img, label], dtype = object)
+        img_labeled = np.array([img.astype("float32"), label], dtype = object)
         print(savename)
         #Save the image + label
         np.save(savename, img_labeled)

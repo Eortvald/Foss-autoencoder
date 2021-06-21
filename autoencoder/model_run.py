@@ -31,10 +31,10 @@ def save_images(x, xhat, show=False):
     fig1, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(4, 5))
 
     ax1.imshow(x)
-    ax1.set_title('Input Image')
+    ax1.set_title(f'Input Image ({epoch})')
 
     ax2.imshow(xhat)
-    ax2.set_title('Reconstructed')
+    ax2.set_title(f'Reconstructed ({epoch})')
 
     for ax in [ax1, ax2]:
         ax.set_xticks([])
@@ -116,14 +116,14 @@ if __name__ == "__main__":
 
 
 
-    TFORM = transforms.Compose([Mask_n_pad(H=180, W=80), transforms.ToTensor(), transforms.Normalize(mean=MEAN, std=STD)])
+    TFORM = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=MEAN, std=STD)])
 
     # Training conditions
-    BSIZE = 100
-    num_epochs = 10
+    BSIZE = 3000
+    num_epochs = 100
     learning_rate = 1e-3
     w_decay = 1e-5
-    PIN = False
+    PIN = True
     # Bottleneck layer size
     z_dim = 30
     torch.cuda.empty_cache()
@@ -159,7 +159,10 @@ if __name__ == "__main__":
         test_save = test_AE(CAE_10Kmodel, testload)
         test_log.append(test_save)
 
+        torch.save(CAE_10Kmodel.state_dict(), f'model_dicts/CAE_{epoch}.pth')
+
     end_time = timeit.default_timer() - start_time
+
     print(end_time)
     print(f'Length of train log: {len(train_log)}')
     print(f'Length of test log: {len(test_log)}')
