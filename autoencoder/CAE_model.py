@@ -8,7 +8,7 @@ from torchvision import datasets, transforms
 from data.MyDataset import *
 from torch.utils.data import DataLoader
 from torchinfo import *
-from model_run import to_img, save_images
+#from model_run import to_img, save_images
 
 
 

@@ -149,7 +149,7 @@ if __name__ == "__main__":
     hidden_out = [16, 12, 10]
     ANN_10Kmodel = ANN(30, hidden_out)
     ANN_10Kmodel = ANN_10Kmodel.to(device)
-    num_epochs = 100
+    num_epochs = 50
     learning_rate = 1e-3
     w_decay = 1e-5
     PIN = True
