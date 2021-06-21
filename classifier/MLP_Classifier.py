@@ -139,12 +139,12 @@ if __name__ == "__main__":
     DATA_SET = 'validation_blob'
     PATH = PATH_dict[DATA_SET]
 
-    BSIZE = 100
+    BSIZE = 512
     classes = ['Oat', 'Broken', 'Rye', 'Wheat', 'BarleyGreen', 'Cleaved', 'Skinned']
     hidden_out = [16, 12, 10]
     ANN_10Kmodel = ANN(30, hidden_out)
     ANN_10Kmodel = ANN_10Kmodel.to(device)
-    num_epochs = 20
+    num_epochs = 100
     learning_rate = 1e-3
     w_decay = 1e-5
     PIN = True
