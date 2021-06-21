@@ -6,10 +6,9 @@ from torch import nn, optim
 from data.MyDataset import *
 from autoencoder.CAE_model import *
 from datetime import *
+
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Using {device} device')
-
-
 
 
 # ANN Definition
@@ -22,18 +21,18 @@ class ANN(nn.Module):
         self.hidden1 = nn.Linear(n_inputs, hidden_out[0])
         self.af1 = nn.ReLU()
 
-    #        self.hidden2 = nn.Linear(hidden_out[0], hidden_out[1])
-    #        self.af2 = nn.ReLU()
-    #        self.hidden3 = nn.Linear(hidden_out[1], hidden_out[2])
-    #        self.af3 = nn.ReLU()
+        self.hidden2 = nn.Linear(hidden_out[0], hidden_out[1])
+        self.af2 = nn.ReLU()
+        self.hidden3 = nn.Linear(hidden_out[1], hidden_out[2])
+        self.af3 = nn.ReLU()
 
     def forward(self, X):
         X = self.hidden1(X)
         X = self.af1(X)
-        #        X = self.hidden2(X)
-        #        X = self.af2(X)
-        #        X = self.hidden3(X)
-        #        X = self.af3(X)
+        X = self.hidden2(X)
+        X = self.af2(X)
+        X = self.hidden3(X)
+        X = self.af3(X)
         return X
 
 
@@ -47,8 +46,7 @@ def train_model(traindataloader, model, ENC):
     dataset_size = len(traindataloader.dataset)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=learningrate, momentum=0.9)
-    #optimizer = optim.Adam(model.parameters(), lr=learningrate)
-
+    # optimizer = optim.Adam(model.parameters(), lr=learningrate)
 
     for i, (inputs, label) in enumerate(traindataloader):
         # ENCODER HERE
@@ -65,6 +63,7 @@ def train_model(traindataloader, model, ENC):
         train_loss += loss.item()
         loss.backward()
         optimizer.step()
+        print(f'{len(inputs)*(i+1)}/{dataset_size}')
 
     train_loss /= dataset_size
     print(f'Avg train loss: {train_loss}')
@@ -82,7 +81,6 @@ def model_evaluate(testdataloader, model, ENC):
     total = 0
 
     confusion = np.zeros((7, 7))
-
 
     label_correct = {1.: 0,
                      2.: 0,
@@ -105,16 +103,22 @@ def model_evaluate(testdataloader, model, ENC):
             # Evaluating model on test set
             # ENCODER HERE
             label = label.to(device)
-            inputs = inputs.to(device)
-            inputs = ENC(inputs).to(device)
+            inputs = img.to(device)
+            inputs = ENC(inputs)
             yhat = model(inputs)
             # Purely for print statement
+            print(yhat)
             loss = criterion(yhat, label)
+            print(loss)
             test_loss += loss.item()
 
-            _, yhat = torch.max(yhat, 1)
 
+            _, yhat = torch.max(yhat, 1)
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~')
+            print(yhat)
             for la, pre in zip(label.detach().cpu().numpy(), yhat.detach().cpu().numpy()):
+                print(la)
+                print(pre)
 
                 label_total[la] += 1
                 if pre == la:
@@ -122,7 +126,7 @@ def model_evaluate(testdataloader, model, ENC):
                     correct += 1
                 total += 1
 
-                confusion[int(la-1)][int(pre-1)] += 1
+                confusion[int(la - 1)][int(pre - 1)] += 1
 
         print(confusion)
         ACC = 100 * float(correct) / total
@@ -130,12 +134,12 @@ def model_evaluate(testdataloader, model, ENC):
         c_acc = [label_correct[i] / label_total[i] * 100 for i in [1., 2., 3., 4., 5., 6., 7.]]
 
         per_class = {'Oat': c_acc[1],
-                        'Broken': c_acc[2],
-                        'Rye': c_acc[3],
-                        'Wheat': c_acc[4],
-                        'BarleyGreen': c_acc[5],
-                        'Cleaved': c_acc[6],
-                        'Skinned': c_acc[7]}
+                     'Broken': c_acc[2],
+                     'Rye': c_acc[3],
+                     'Wheat': c_acc[4],
+                     'BarleyGreen': c_acc[5],
+                     'Cleaved': c_acc[6],
+                     'Skinned': c_acc[7]}
 
         # Accuracy calculation and print
         test_loss /= dataset_size
@@ -160,12 +164,10 @@ if __name__ == "__main__":
         'grainmix': 'C:/ASB/Projects/EyefossAutoencoder/Fagprojekt-2021/grainmix/'
     }
 
-    DATA_SET = 'validation_grain'
+    DATA_SET = 'validation_blob'
     PATH = PATH_dict[DATA_SET]
 
-
-
-    BSIZE = 3000
+    BSIZE = 5
     classes = ['Oat', 'Broken', 'Rye', 'Wheat', 'BarleyGreen', 'Cleaved', 'Skinned']
     hidden_out = [16, 12, 10]
     ANN_10Kmodel = ANN(30, hidden_out)
@@ -176,7 +178,6 @@ if __name__ == "__main__":
     PIN = True
     torch.cuda.empty_cache()
 
-
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     aemodel = CAE(z_dim=30).to(device)
     aemodel.load_state_dict(torch.load('../autoencoder/model_dicts/PTH_Grain/CAE_69.pth', map_location=device))
@@ -185,13 +186,11 @@ if __name__ == "__main__":
     TFORM = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=MEAN, std=STD)])
     ENCO = lambda img: aemodel.encode(img)
 
-
-    traindata = KornDataset(data_path=PATH + '/train/', transform=TFORM)  # the dataset object can be indexed like a regular list
+    traindata = KornDataset(data_path=PATH + '/train/', transform=TFORM, label_path=label_path)
     trainload = DataLoader(traindata, batch_size=BSIZE, shuffle=True, num_workers=0, pin_memory=PIN)
 
-    testdata = KornDataset(data_path=PATH + '/test/', transform=TFORM)
+    testdata = KornDataset(data_path=PATH + '/test/', transform=TFORM, label_path=label_path)
     testload = DataLoader(testdata, batch_size=BSIZE, shuffle=True, num_workers=0, pin_memory=PIN)
-
 
     train_log = []
     test_log = []
@@ -213,8 +212,6 @@ if __name__ == "__main__":
 
     print(end_time)
 
-
-
     torch.save(ANN_10Kmodel.state_dict(), 'classifier/model_dicts/ANN_Big.pth')
 
     SESSION = str(datetime.now())[5:-10].replace(' ', '_').replace(':', '-')
@@ -229,17 +226,7 @@ if __name__ == "__main__":
     ax.legend()
     figR.savefig(f"../plots/autoencoder-plots/session_results-{SESSION}.png")
 
-
-
-
     # https://towardsdatascience.com/pytorch-tabular-multiclass-classification-9f8211a123ab
-
-
-
-
-
-
-
 
 """
 #DONT REMOVE IS NEEDED LATER

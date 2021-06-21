@@ -10,10 +10,10 @@ import pickle
 import matplotlib.pyplot as plt
 import timeit
 
-
 # PATH = PATH_dict['']    # add 2017 to mother dict first
 # PATH = 'M:/R&D/Technology access controlled/Projects access controlled/AIFoss/Data/BlobArchive/'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 
 def _load_pickle_file(path):
     infile = open(path, 'rb')
@@ -66,7 +66,7 @@ class Mask_n_pad(object):
 
         if (w > 80) or (h > 180):
 
-            plt.imshow(img[:,:,4], img[:,:,2], img[:,:,1])
+            plt.imshow(img[:, :, 4], img[:, :, 2], img[:, :, 1])
             plt.show()
             raise Exception('Image is too large. Larger than width:', self.W, 'or height', self.H)
         else:
@@ -88,16 +88,24 @@ class Mask_n_pad(object):
             return img.astype('float32')
 
 
+numericClass = {'Oat': 1.,
+                'Broken': 2.,
+                'Rye': 3.,
+                'Wheat': 4.,
+                'BarleyGreen': 5.,
+                'Cleaved': 6.,
+                'Skinned': 7.}
+
 
 class KornDataset(Dataset):
 
     def __init__(self, data_path, label_path=None, transform=None):
         self.label_path = label_path
-        self.data_files = _make_data_list(data_path)
+        self.data_files = _make_data_list(data_path)[:5]
         self.transform = transform
         self.get_label = False
         if self.label_path is not None:
-            self.labels = pd.read_csv(label_path,low_memory=False).set_index(['Names'])
+            self.labels = pd.read_csv(label_path, low_memory=False).set_index(['Names'])
             self.get_label = True
 
     def __getitem__(self, index):
@@ -106,13 +114,12 @@ class KornDataset(Dataset):
         if self.transform:
             img = self.transform(img)
 
-
         if self.get_label:
             im = os.path.basename(os.path.normpath(self.data_files[index])).split(".")[0]
             label = str(self.labels.loc[im][0:7][self.labels.loc[im][0:7] == True]).split(' ')[0]
-            return img, label
+            label = torch.tensor(numericClass[label], dtype=torch.long)
 
-        return img, 'N/A'
+            return img, label
 
     def __len__(self):
         return len(self.data_files)
@@ -154,15 +161,8 @@ if __name__ == '__main__':
         print(batch_num)
     end_time2 = start_time = timeit.default_timer() - start_time2
 
-
-    #print(end_time1)
+    # print(end_time1)
     print(end_time2)
-
-
-
-
-
-
 
 '''
 # Test of classes
