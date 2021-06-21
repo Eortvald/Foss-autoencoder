@@ -62,6 +62,7 @@ def train_model(traindataloader, model, ENC):
         train_loss += loss.item()
         loss.backward()
         optimizer.step()
+
         print(f'{len(inputs) * (i + 1)}/{dataset_size}')
 
         _, yhat = torch.max(yhat, 1)
