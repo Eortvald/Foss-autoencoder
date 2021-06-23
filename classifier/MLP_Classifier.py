@@ -6,8 +6,9 @@ from torch import nn, optim
 from data.MyDataset import *
 from autoencoder.CAE_model import *
 from datetime import *
+from tqdm import tqdm
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cuda:1' if torch.cuda.is_available() else 'cpu'
 print(f'Using {device} device')
 
 
@@ -54,15 +55,19 @@ def train_model(traindataloader, model, ENC):
         # ENCODER HERE
         inputs = inputs.to(device)
         label = label.to(device)
-        inputs = ENC(inputs).to(device)
+        inputs = ENC(inputs)
         optimizer.zero_grad()
+
         yhat = model(inputs)
 
         loss = criterion(yhat, label)
+
         train_loss += loss.item()
         loss.backward()
         optimizer.step()
-        print(f'{len(inputs) * (i + 1)}/{dataset_size}')
+
+        if i % 1000 == 0:
+            print(f'{len(inputs) * (i + 1)}/{dataset_size}')
 
         _, yhat = torch.max(yhat, 1)
 
@@ -138,19 +143,17 @@ if __name__ == "__main__":
 
     DATA_SET = 'validation_blob'
     PATH = PATH_dict[DATA_SET]
-
+    torch.cuda.empty_cache()
     BSIZE = 100
     classes = ['Oat', 'Broken', 'Rye', 'Wheat', 'BarleyGreen', 'Cleaved', 'Skinned']
     hidden_out = [16, 12, 10]
     ANN_10Kmodel = ANN(30, hidden_out)
     ANN_10Kmodel = ANN_10Kmodel.to(device)
-    num_epochs = 20
+    num_epochs = 50
     learning_rate = 1e-3
     w_decay = 1e-5
     PIN = True
-    torch.cuda.empty_cache()
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     aemodel = CAE(z_dim=30).to(device)
     aemodel.load_state_dict(torch.load('../autoencoder/model_dicts/PTH_Grain/CAE_69.pth', map_location=device))
     aemodel.eval()
